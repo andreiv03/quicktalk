@@ -1,0 +1,74 @@
+:root {
+  --foreground-one: #e8e8e9;
+  --foreground-two: #8c8d91;
+  --foreground-three: #5a5a71;
+  --background-one: #1d1e26;
+  --background-two: #23252d;
+  --background-three: #2a2b36;
+  --stroke: #2e2e38;
+
+  --green-foreground: #6cb8a8;
+  --green-background: #1e252c;
+  --green-stroke: #375353;
+
+  --red-foreground: #ec857d;
+  --red-background: #2f282f;
+  --red-stroke: #71484a;
+
+  --orange-foreground: #dba550;
+  --orange-background: #2b2829;
+  --orange-stroke: #685336;
+
+  --accent: #5c61ed;
+  --light-accent: #3f405c;
+  --dark-accent: #4449ce;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+input,
+textarea,
+button {
+  color: var(--foreground-one);
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.25px;
+}
+
+input,
+textarea,
+button {
+  background: none;
+  border: none;
+  outline: none;
+}
+
+body {
+  background: var(--background-one);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--foreground-one);
+}
+
+#root {
+  width: 100vw;
+  min-height: 100vh;
+}
+
+// Poppins
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
