@@ -2,13 +2,12 @@
   height: 100vh;
   padding: 2rem 0;
   background: var(--background-three);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
   .container {
-    width: min(100vw, 1024px);
+    position: relative;
+    width: min(max(768px, 100vw), 1024px);
     height: 100%;
+    margin: 0 auto;
     border-radius: 1rem;
     background: var(--background-one);
     display: flex;

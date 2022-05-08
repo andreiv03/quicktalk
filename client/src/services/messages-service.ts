@@ -3,7 +3,7 @@ import type { MessageInterface, MessageInputDataInterface } from "../interfaces/
 
 class MessagesService {
   getMessages(token: string, channel: string) {
-    return axios.post<MessageInterface[]>("/messages/get", { channel }, {
+    return axios.get<MessageInterface[]>(`/messages/get/${channel}`, {
       headers: { authorization: token }
     });
   }

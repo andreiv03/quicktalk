@@ -1,6 +1,6 @@
 import mongoose, { Schema, SchemaOptions } from "mongoose";
 
-interface UserInterface {
+export interface UserInterface {
   _id: string;
   email: string;
   password: string;

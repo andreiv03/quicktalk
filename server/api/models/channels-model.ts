@@ -1,7 +1,8 @@
 import mongoose, { Schema, SchemaOptions } from "mongoose";
 
-interface ChannelInterface {
+export interface ChannelInterface {
   _id: string;
+  creator: string;
   name: string;
   type: string;
 };
@@ -11,6 +12,11 @@ const schemaOptions: SchemaOptions = {
 };
 
 const channelsSchema = new Schema<ChannelInterface>({
+  creator: {
+    type: String,
+    required: true,
+    trim: true
+  },
   name: {
     type: String,
     required: true,

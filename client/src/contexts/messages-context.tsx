@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 
 import { UsersContext } from "./users-context";
 import { ChannelsContext } from "./channels-context";
+import socket from "../services/socket";
 import type { MessageInterface } from "../interfaces/messages-interface";
 
 interface ProviderStateInterface {
@@ -31,6 +32,12 @@ export const MessagesProvider: React.FC = ({ children }) => {
 
     getMessages();
   }, [token, currentChannel]);
+
+  useEffect(() => {
+    socket.on("send_message", (data: MessageInterface) => {
+      setMessages((prevState: MessageInterface[]) => [...prevState, data]);
+    });
+  }, [setMessages]);
 
   const state: ProviderStateInterface = {
     messages: [messages, setMessages]

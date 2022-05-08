@@ -4,7 +4,6 @@ import type { UserInterface } from "../interfaces/users-interfaces";
 interface ProviderStateInterface {
   token: [string, React.Dispatch<React.SetStateAction<string>>];
   user: [UserInterface, React.Dispatch<React.SetStateAction<UserInterface>>];
-  allUsers: UserInterface[];
 };
 
 export const userInitialState: UserInterface = {
@@ -18,7 +17,6 @@ export const UsersContext = createContext<ProviderStateInterface>({} as Provider
 export const UsersProvider: React.FC = ({ children }) => {
   const [token, setToken] = useState("");
   const [user, setUser] = useState<UserInterface>(userInitialState);
-  const [allUsers, setAllUsers] = useState<UserInterface[]>([]);
 
   useEffect(() => {
     const authenticated = localStorage.getItem("authenticated");
@@ -54,26 +52,9 @@ export const UsersProvider: React.FC = ({ children }) => {
     getUser();
   }, [token]);
 
-  useEffect(() => {
-    if (!token) return;
-
-    const getAllUsers = async () => {
-      try {
-        const { default: usersService } = await import("../services/users-service");
-        const { data } = await usersService.getAllUsers(token);
-        setAllUsers(data);
-      } catch (error: any) {
-        return alert(error);
-      }
-    }
-
-    getAllUsers();
-  }, [token]);
-
   const state: ProviderStateInterface = {
     token: [token, setToken],
-    user: [user, setUser],
-    allUsers
+    user: [user, setUser]
   };
 
   return (

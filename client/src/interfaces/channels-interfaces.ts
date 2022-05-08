@@ -1,4 +1,5 @@
 export interface ChannelFormDataInterface {
+  creator: string;
   name: string;
   type: string;
 };

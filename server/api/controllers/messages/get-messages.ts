@@ -1,12 +1,8 @@
 import type { Request, Response } from "express";
 
-interface RequestBody {
-  channel: string;
-};
-
 const getMessages = async (req: Request, res: Response) => {
   try {
-    const { channel }: RequestBody = req.body;
+    const { channel } = req.params;
     if (!channel) return res.status(400).json({ message: "Something went wrong!" });
 
     const { default: MessagesModel } = await import("../../models/messages-model");

@@ -6,7 +6,7 @@ import authorization from "../middleware/authorization";
 
 const router: Router = Router();
 
-router.post("/get", authorization, getMessages);
+router.get("/get/:channel", authorization, getMessages);
 router.post("/post", authorization, postMessage);
 
 export default router;

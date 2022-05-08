@@ -137,7 +137,7 @@
   left: 50%;
   z-index: 10;
   transform: translate(-50%, -50%);
-  width: min(350px, 100vw);
+  width: min(350px, calc(100vw - 1rem));
   height: fit-content;
   padding: 1.5rem;
   border-radius: 0.75rem;
@@ -167,6 +167,7 @@
       margin-top: 0.5rem;
 
       input {
+        width: 100%;
         padding: 0.5rem 1rem 0.5rem 2rem;
         border-radius: 0.25rem;
         background: var(--background-one);
@@ -211,8 +212,9 @@
         }
 
         &:disabled {
-          cursor: not-allowed;
           background: var(--light-accent);
+          color: var(--foreground-two);
+          cursor: not-allowed;
         }
       }
     }
@@ -237,7 +239,7 @@
   transition: 100ms ease-in;
 
   &.active {
-    opacity: 0.75;
+    opacity: 0.5;
     visibility: visible;
   }
 }

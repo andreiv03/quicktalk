@@ -4,34 +4,36 @@ import { RiLogoutCircleLine } from "react-icons/ri";
 
 import { UsersContext, userInitialState } from "../contexts/users-context";
 import { ChannelsContext } from "../contexts/channels-context";
+import socket from "../services/socket";
 import handlers from "../utils/handlers";
+import helpers from "../utils/helpers";
 import type { ChannelFormDataInterface as FormData, ChannelInterface } from "../interfaces/channels-interfaces";
 
 import styles from "../styles/components/sidebar.module.scss";
-import helpers from "../utils/helpers";
-import socket from "../services/socket";
 
 const formDataInitialState: FormData = {
+  creator: "",
   name: "",
   type: ""
 };
 
 const Sidebar: React.FC = () => {
-  const { token: [token, setToken], user: [, setUser] } = useContext(UsersContext);
-  const { callback: [callback, setCallback], currentChannel: [currentChannel, setCurrentChannel], publicChannels } = useContext(ChannelsContext);
+  const { token: [token, setToken], user: [user, setUser] } = useContext(UsersContext);
+  const { currentChannel: [currentChannel, setCurrentChannel], publicChannels } = useContext(ChannelsContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>(formDataInitialState);
 
   const handleJoinChannel = (channel: ChannelInterface) => {
-    if (currentChannel === channel) return;
-    setCurrentChannel(channel);
+    if (currentChannel._id === channel._id) return;
+    if (currentChannel._id) socket.emit("leave_channel", currentChannel._id);
     socket.emit("join_channel", channel._id);
+    setCurrentChannel(channel);
   }
 
   const handleNewForm = (type: string) => {
     setIsModalOpen(true);
-    setFormData({ name: "", type });
+    setFormData({ creator: user._id, name: "", type });
   }
 
   const handleFormReset = () => {
@@ -39,13 +41,13 @@ const Sidebar: React.FC = () => {
     setFormData(formDataInitialState);
   }
 
-  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateChannel = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
       const { default: channelsService } = await import("../services/channels-service");
       const { data } = await channelsService.createChannel(token, formData);
-      setCallback(!callback);
+      socket.emit("create_channel", data);
       setCurrentChannel(data);
       setIsModalOpen(false);
       setFormData(formDataInitialState);
@@ -58,6 +60,7 @@ const Sidebar: React.FC = () => {
     try {
       const { default: authService } = await import("../services/auth-service");
       await authService.logout();
+      if (currentChannel._id) socket.emit("leave_channel", currentChannel._id);
       setToken("");
       setUser(userInitialState);
       setCurrentChannel({} as ChannelInterface);
@@ -112,7 +115,7 @@ const Sidebar: React.FC = () => {
       <div className={`${styles.modal} ${isModalOpen ? styles.active : ""}`}>
         <h3>Create channel</h3>
 
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleCreateChannel}>
           <label htmlFor="name">Channel name</label>
           <div className={styles.input_container}>
             <input

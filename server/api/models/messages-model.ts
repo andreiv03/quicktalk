@@ -1,6 +1,6 @@
 import mongoose, { Schema, SchemaOptions } from "mongoose";
 
-interface MessageInterface {
+export interface MessageInterface {
   _id: string;
   channel: string;
   sender: string;
