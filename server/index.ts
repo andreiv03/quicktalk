@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 import http from "http";
 import { Server } from "socket.io";
 
@@ -16,6 +17,17 @@ app.use(express.json());
 app.use(cors(options));
 app.use(cookieParser());
 app.use(routes);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(path.resolve(), "/client/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(path.resolve(), "client", "build", "index.html"));
+  });
+} else {
+  app.get("*", (req, res) => {
+    res.send("Server is running!");
+  });
+}
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, { cors: options });
