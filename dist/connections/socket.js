@@ -16,8 +16,8 @@ const socket = (io) => {
             socket.leave(channel);
             io.emit("delete_channel", channel);
         });
-        socket.on("send_message", (data) => {
-            io.sockets.in(data.channel).emit("send_message", Object.assign(Object.assign({}, data), { createdAt: new Date() }));
+        socket.on("send_message", (message) => {
+            io.sockets.in(message.channel).emit("send_message", Object.assign(Object.assign({}, message), { createdAt: Date.now() }));
         });
     });
 };

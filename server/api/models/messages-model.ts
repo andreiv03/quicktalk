@@ -3,6 +3,7 @@ import mongoose, { Schema, SchemaOptions } from "mongoose";
 export interface MessageInterface {
   _id: string;
   channel: string;
+  createdAt: any;
   sender: string;
   text: string;
 };
@@ -14,8 +15,13 @@ const schemaOptions: SchemaOptions = {
 const messagesSchema = new Schema<MessageInterface>({
   channel: {
     type: String,
-    trim: true,
-    required: true
+    required: true,
+    trim: true
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+    index: { expires: "1d" }
   },
   sender: {
     type: String,

@@ -17,7 +17,9 @@ class JsonWebToken {
             jsonwebtoken_1.default.sign(data, constants_1.JWT_SECRET, { expiresIn }, (error, token) => {
                 if (error)
                     reject(error);
-                resolve(token);
+                if (token)
+                    resolve(token);
+                reject("Token not found!");
             });
         });
     }
@@ -28,7 +30,9 @@ class JsonWebToken {
             jsonwebtoken_1.default.verify(token, constants_1.JWT_SECRET, (error, payload) => {
                 if (error)
                     reject(error);
-                resolve(payload);
+                if (payload)
+                    resolve(payload);
+                reject("Payload not found!");
             });
         });
     }

@@ -12,7 +12,7 @@ const postMessage = async (req: Request, res: Response) => {
     if (!channel || !sender || !text) return res.status(400).json({ message: "Something went wrong!" });
 
     const { default: MessagesModel } = await import("../../models/messages-model");
-    const newMessage = await MessagesModel.create({ channel, sender, text });
+    const newMessage = await MessagesModel.create({ channel, createdAt: Date.now(), sender, text });
 
     return res.status(200).json({ _id: newMessage._id });
   } catch (error: any) {

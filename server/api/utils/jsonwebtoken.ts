@@ -13,7 +13,8 @@ class JsonWebToken {
   
       jwt.sign(data, JWT_SECRET, { expiresIn }, (error, token) => {
         if (error) reject(error);
-        resolve(token!);
+        if (token) resolve(token);
+        reject("Token not found!");
       });
     });
   }
@@ -24,7 +25,8 @@ class JsonWebToken {
   
       jwt.verify(token, JWT_SECRET, (error, payload) => {
         if (error) reject(error);
-        resolve(payload as JwtPayload);
+        if (payload) resolve(payload as JwtPayload);
+        reject("Payload not found!");
       });
     });
   }

@@ -1,5 +1,5 @@
 import axios from "./axios";
-import type { MessageInterface, MessageInputDataInterface } from "../interfaces/messages-interface";
+import type { MessageInterface } from "../interfaces/messages-interface";
 
 class MessagesService {
   getMessages(token: string, channel: string) {
@@ -8,7 +8,7 @@ class MessagesService {
     });
   }
   
-  postMessage(token: string, data: MessageInputDataInterface) {
+  postMessage(token: string, data: Omit<MessageInterface, "_id" | "createdAt">) {
     return axios.post<{ _id: string, createdAt: string }>("/messages/post", data, {
       headers: { authorization: token }
     });

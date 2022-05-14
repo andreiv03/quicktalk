@@ -23,8 +23,8 @@ const socket = (io: Server) => {
       io.emit("delete_channel", channel);
     });
 
-    socket.on("send_message", (data: MessageInterface) => {
-      io.sockets.in(data.channel).emit("send_message", { ...data, createdAt: new Date() });
+    socket.on("send_message", (message: MessageInterface) => {
+      io.sockets.in(message.channel).emit("send_message", { ...message, createdAt: Date.now() });
     });
   });
 }

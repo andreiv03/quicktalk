@@ -21,14 +21,10 @@ app.use((0, cookie_parser_1.default)());
 app.use(routes_1.default);
 if (process.env.NODE_ENV === "production") {
     app.use(express_1.default.static(path_1.default.join(path_1.default.resolve(), "/client/build")));
-    app.get("*", (req, res) => {
-        res.sendFile(path_1.default.join(path_1.default.resolve(), "client", "build", "index.html"));
-    });
+    app.get("*", (req, res) => res.sendFile(path_1.default.join(path_1.default.resolve(), "client", "build", "index.html")));
 }
 else {
-    app.get("*", (req, res) => {
-        res.send("Server is running!");
-    });
+    app.get("*", (req, res) => res.send("Server is running!"));
 }
 const httpServer = http_1.default.createServer(app);
 const io = new socket_io_1.Server(httpServer, { cors: options });

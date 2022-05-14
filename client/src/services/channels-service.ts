@@ -1,5 +1,5 @@
 import axios from "./axios";
-import type { ChannelInterface, ChannelFormDataInterface } from "../interfaces/channels-interfaces";
+import type { ChannelInterface } from "../interfaces/channels-interfaces";
 
 class ChannelsService {
   getChannels(token: string, type: string) {
@@ -8,7 +8,7 @@ class ChannelsService {
     });
   }
 
-  createChannel(token: string, formData: ChannelFormDataInterface) {
+  createChannel(token: string, formData: Omit<ChannelInterface, "_id">) {
     return axios.post<ChannelInterface>("/channels/create", formData, {
       headers: { authorization: token }
     });

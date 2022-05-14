@@ -35,7 +35,7 @@ const postMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!channel || !sender || !text)
             return res.status(400).json({ message: "Something went wrong!" });
         const { default: MessagesModel } = yield Promise.resolve().then(() => __importStar(require("../../models/messages-model")));
-        const newMessage = yield MessagesModel.create({ channel, sender, text });
+        const newMessage = yield MessagesModel.create({ channel, createdAt: Date.now(), sender, text });
         return res.status(200).json({ _id: newMessage._id });
     }
     catch (error) {

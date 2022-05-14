@@ -5,12 +5,12 @@
   align-items: center;
 
   .wrapper {
-    max-width: 500px;
+    max-width: 450px;
     margin: 0 auto;
 
     .content {
       height: fit-content;
-      padding: 2rem;
+      padding: 1rem;
 
       h1 {
         margin-bottom: 0.5rem;
@@ -149,6 +149,18 @@
             background: var(--red-foreground);
             cursor: not-allowed;
           }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .page {
+    .wrapper {
+      .content {
+        h1 {
+          font-size: 1.75rem;
         }
       }
     }

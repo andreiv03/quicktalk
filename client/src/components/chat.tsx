@@ -3,19 +3,21 @@ import { RiSendPlaneFill } from "react-icons/ri";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import moment from "moment";
 
+import { SystemContext } from "../contexts/system-context";
 import { UsersContext } from "../contexts/users-context";
 import { ChannelsContext } from "../contexts/channels-context";
 import { MessagesContext } from "../contexts/messages-context";
 import socket from "../services/socket";
-import type { MessageInputDataInterface, MessageInterface } from "../interfaces/messages-interface";
+import type { MessageInterface } from "../interfaces/messages-interface";
 import type { ChannelInterface } from "../interfaces/channels-interfaces";
 
 import styles from "../styles/components/chat.module.scss";
 
 const Chat: React.FC = () => {
+  const { createNewToast } = useContext(SystemContext);
   const { token: [token], user: [user] } = useContext(UsersContext);
   const { currentChannel: [currentChannel, setCurrentChannel] } = useContext(ChannelsContext);
-  const { messages: [messages, setMessages] } = useContext(MessagesContext);
+  const { messages: [messages] } = useContext(MessagesContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageText, setMessageText] = useState("");
@@ -29,7 +31,7 @@ const Chat: React.FC = () => {
     event.preventDefault();
     
     try {
-      const inputData: MessageInputDataInterface = {
+      const inputData: Omit<MessageInterface, "_id" | "createdAt"> = {
         channel: currentChannel._id,
         sender: user.username,
         text: messageText
@@ -40,7 +42,7 @@ const Chat: React.FC = () => {
       socket.emit("send_message", { ...inputData, _id: data._id });
       setMessageText("");
     } catch (error: any) {
-      return alert(error);
+      return createNewToast(error, "error");
     }
   }
 
@@ -56,7 +58,7 @@ const Chat: React.FC = () => {
       socket.emit("delete_channel", currentChannel._id);
       setCurrentChannel({} as ChannelInterface);
     } catch (error: any) {
-      return alert(error);
+      return createNewToast(error, "error");
     }
   }
 
@@ -66,7 +68,7 @@ const Chat: React.FC = () => {
         <div className={styles.top_section}>
           <div className={styles.column}>
             <div className={styles.hashtag} />
-            <h3>{currentChannel.name}</h3>
+            <h3>{currentChannel.name.replaceAll(" ", "-")}</h3>
           </div>
 
           <div className={styles.column}>
@@ -108,6 +110,7 @@ const Chat: React.FC = () => {
               placeholder="Write a message"
               value={messageText}
               onChange={event => setMessageText(event.target.value)}
+              autoFocus
             />
 
             <button type="submit" disabled={!messageText}>

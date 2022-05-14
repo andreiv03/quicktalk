@@ -17,12 +17,7 @@ const register = async (req: Request, res: Response) => {
     if (user) return res.status(400).json({ message: "Email address already registered!" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await UsersModel.create({
-      contacts: [],
-      email,
-      password: hashedPassword,
-      username
-    });
+    const newUser = await UsersModel.create({ email, password: hashedPassword, username });
 
     const { default: jsonWebToken } = await import("../../utils/jsonwebtoken");
     const accessToken = await jsonWebToken.signToken(newUser._id, "10m");

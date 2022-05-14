@@ -43,12 +43,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (user)
             return res.status(400).json({ message: "Email address already registered!" });
         const hashedPassword = yield bcrypt_1.default.hash(password, 10);
-        const newUser = yield UsersModel.create({
-            contacts: [],
-            email,
-            password: hashedPassword,
-            username
-        });
+        const newUser = yield UsersModel.create({ email, password: hashedPassword, username });
         const { default: jsonWebToken } = yield Promise.resolve().then(() => __importStar(require("../../utils/jsonwebtoken")));
         const accessToken = yield jsonWebToken.signToken(newUser._id, "10m");
         const refreshToken = yield jsonWebToken.signToken(newUser._id, "7d");

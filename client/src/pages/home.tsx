@@ -21,6 +21,11 @@ const Home: React.FC = () => {
           <p>You can now connect with any user around the world! Just choose any channel or create a new one from the sidebar.</p>
         </div>
       </div>
+
+      <div className={styles.not_available}>
+        <h3>Not available!</h3>
+        <p>This app is not available on mobile or tablet devices. Please switch to something else!</p>
+      </div>
     </div>
   );
 }

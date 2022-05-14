@@ -27,8 +27,13 @@ const schemaOptions = {
 const messagesSchema = new mongoose_1.Schema({
     channel: {
         type: String,
-        trim: true,
-        required: true
+        required: true,
+        trim: true
+    },
+    createdAt: {
+        type: Date,
+        required: true,
+        index: { expires: "1d" }
     },
     sender: {
         type: String,

@@ -2,27 +2,29 @@ import { useContext, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { RiLogoutCircleLine } from "react-icons/ri";
 
+import { SystemContext } from "../contexts/system-context";
 import { UsersContext, userInitialState } from "../contexts/users-context";
 import { ChannelsContext } from "../contexts/channels-context";
 import socket from "../services/socket";
 import handlers from "../utils/handlers";
 import helpers from "../utils/helpers";
-import type { ChannelFormDataInterface as FormData, ChannelInterface } from "../interfaces/channels-interfaces";
+import type { ChannelInterface } from "../interfaces/channels-interfaces";
 
 import styles from "../styles/components/sidebar.module.scss";
 
-const formDataInitialState: FormData = {
+const formDataInitialState: Omit<ChannelInterface, "_id"> = {
   creator: "",
   name: "",
   type: ""
 };
 
 const Sidebar: React.FC = () => {
+  const { createNewToast } = useContext(SystemContext);
   const { token: [token, setToken], user: [user, setUser] } = useContext(UsersContext);
   const { currentChannel: [currentChannel, setCurrentChannel], publicChannels } = useContext(ChannelsContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState<FormData>(formDataInitialState);
+  const [formData, setFormData] = useState<Omit<ChannelInterface, "_id">>(formDataInitialState);
 
   const handleJoinChannel = (channel: ChannelInterface) => {
     if (currentChannel._id === channel._id) return;
@@ -36,23 +38,18 @@ const Sidebar: React.FC = () => {
     setFormData({ creator: user._id, name: "", type });
   }
 
-  const handleFormReset = () => {
-    setIsModalOpen(false);
-    setFormData(formDataInitialState);
-  }
-
   const handleCreateChannel = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
       const { default: channelsService } = await import("../services/channels-service");
-      const { data } = await channelsService.createChannel(token, formData);
+      const { data } = await channelsService.createChannel(token, { ...formData, name: formData.name.replace(/-$/, "") });
       socket.emit("create_channel", data);
       setCurrentChannel(data);
       setIsModalOpen(false);
       setFormData(formDataInitialState);
     } catch (error: any) {
-      return alert(error);
+      return createNewToast(error, "error");
     }
   }
 
@@ -64,9 +61,10 @@ const Sidebar: React.FC = () => {
       setToken("");
       setUser(userInitialState);
       setCurrentChannel({} as ChannelInterface);
+      setIsModalOpen(false);
       localStorage.removeItem("authenticated");
     } catch (error: any) {
-      return alert(error);
+      return createNewToast(error, "error");
     }
   }
 
@@ -125,13 +123,13 @@ const Sidebar: React.FC = () => {
               autoComplete="off"
               placeholder="new-channel"
               value={formData.name}
-              onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}
+              onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData, "channel")}
             />
           </div>
 
           <div className={styles.buttons}>
-            <button type="button" onClick={handleFormReset}>Close</button>
-            <button type="submit" disabled={!formData.name || publicChannels.length >= 5}>Create</button>
+            <button type="button" onClick={() => { setIsModalOpen(false); setFormData(formDataInitialState); }}>Close</button>
+            <button type="submit" disabled={!formData.name || publicChannels.length >= 5 || formData.name.length > 25}>Create</button>
           </div>
         </form>
       </div>

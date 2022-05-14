@@ -1,13 +1,13 @@
 import axios from "./axios";
-import type { AuthResponseInterface, LoginFormDataInterface, RegisterFormDataInterface } from "../interfaces/auth-interfaces";
+import type { LoginFormDataInterface, RegisterFormDataInterface } from "../interfaces/auth-interfaces";
 
 class AuthService {
   register(formData: RegisterFormDataInterface) {
-    return axios.post<AuthResponseInterface>("/auth/register", formData);
+    return axios.post<{ accessToken: string }>("/auth/register", formData);
   }
 
   login(formData: LoginFormDataInterface) {
-    return axios.post<AuthResponseInterface>("/auth/login", formData);
+    return axios.post<{ accessToken: string }>("/auth/login", formData);
   }
 
   logout() {
@@ -15,7 +15,7 @@ class AuthService {
   }
 
   refreshToken() {
-    return axios.get<AuthResponseInterface>("/auth/refresh-token");
+    return axios.get<{ accessToken: string }>("/auth/refresh-token");
   }
 };
 
