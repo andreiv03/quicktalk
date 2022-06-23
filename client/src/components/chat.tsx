@@ -3,7 +3,6 @@ import { RiSendPlaneFill } from "react-icons/ri";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import moment from "moment";
 
-import { SystemContext } from "../contexts/system-context";
 import { UsersContext } from "../contexts/users-context";
 import { ChannelsContext } from "../contexts/channels-context";
 import { MessagesContext } from "../contexts/messages-context";
@@ -14,7 +13,6 @@ import type { ChannelInterface } from "../interfaces/channels-interfaces";
 import styles from "../styles/components/chat.module.scss";
 
 const Chat: React.FC = () => {
-  const { createNewToast } = useContext(SystemContext);
   const { token: [token], user: [user] } = useContext(UsersContext);
   const { currentChannel: [currentChannel, setCurrentChannel] } = useContext(ChannelsContext);
   const { messages: [messages] } = useContext(MessagesContext);
@@ -42,7 +40,7 @@ const Chat: React.FC = () => {
       socket.emit("send_message", { ...inputData, _id: data._id });
       setMessageText("");
     } catch (error: any) {
-      return createNewToast(error, "error");
+      return alert(error.response.data.message);
     }
   }
 
@@ -58,7 +56,7 @@ const Chat: React.FC = () => {
       socket.emit("delete_channel", currentChannel._id);
       setCurrentChannel({} as ChannelInterface);
     } catch (error: any) {
-      return createNewToast(error, "error");
+      return alert(error.response.data.message);
     }
   }
 
@@ -126,7 +124,7 @@ const Chat: React.FC = () => {
 
         <div className={styles.buttons}>
           <button type="button" onClick={handleLeaveChannel}>Leave channel</button>
-          <button type="button" disabled={currentChannel.creator !== user._id} onClick={handleDeleteChannel}>Delete channel</button>
+          <button type="button" disabled={messages.length > 0} onClick={handleDeleteChannel}>Delete channel</button>
           <button type="button" onClick={() => setIsModalOpen(false)}>Close</button>
         </div>
       </div>

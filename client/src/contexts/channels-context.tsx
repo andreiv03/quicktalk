@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
 
-import { SystemContext } from "./system-context";
 import { UsersContext } from "./users-context";
 import socket from "../services/socket";
 import type { ChannelInterface } from "../interfaces/channels-interfaces";
@@ -13,7 +12,6 @@ interface ProviderStateInterface {
 export const ChannelsContext = createContext<ProviderStateInterface>({} as ProviderStateInterface);
 
 export const ChannelsProvider: React.FC = ({ children }) => {
-  const { createNewToast } = useContext(SystemContext);
   const { token: [token] } = useContext(UsersContext);
 
   const [currentChannel, setCurrentChannel] = useState<ChannelInterface>({} as ChannelInterface);
@@ -28,12 +26,12 @@ export const ChannelsProvider: React.FC = ({ children }) => {
         const { data } = await channelsService.getChannels(token, "public");
         setPublicChannels(data);
       } catch (error: any) {
-        return createNewToast(error, "error");
+        return alert(error.response.data.message);
       }
     }
 
     getPublicChannels();
-  }, [token, createNewToast]);
+  }, [token]);
 
   useEffect(() => {
     socket.on("create_channel", (newChannel: ChannelInterface) => {

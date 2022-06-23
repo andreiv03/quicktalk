@@ -34,9 +34,9 @@ const authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         if (!authorizationToken)
             return res.status(400).json({ message: "Unauthorized!" });
         const { default: jsonWebToken } = yield Promise.resolve().then(() => __importStar(require("../utils/jsonwebtoken")));
-        const decoded = yield jsonWebToken.verifyToken(authorizationToken);
+        const payload = yield jsonWebToken.verifyToken(authorizationToken);
         const { default: UsersModel } = yield Promise.resolve().then(() => __importStar(require("../models/users-model")));
-        const user = yield UsersModel.findById(decoded.sub).select("_id").lean();
+        const user = yield UsersModel.findById(payload.sub).select("_id").lean();
         if (!user)
             return res.status(400).json({ message: "User not found!" });
         req.userId = user._id;

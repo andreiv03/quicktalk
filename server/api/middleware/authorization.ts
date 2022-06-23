@@ -6,10 +6,10 @@ const authorization = async (req: Request, res: Response, next: NextFunction) =>
     if (!authorizationToken) return res.status(400).json({ message: "Unauthorized!" });
   
     const { default: jsonWebToken } = await import("../utils/jsonwebtoken");
-    const decoded = await jsonWebToken.verifyToken(authorizationToken);
+    const payload = await jsonWebToken.verifyToken(authorizationToken);
 
     const { default: UsersModel } = await import("../models/users-model");
-    const user = await UsersModel.findById(decoded.sub).select("_id").lean();
+    const user = await UsersModel.findById(payload.sub).select("_id").lean();
     if (!user) return res.status(400).json({ message: "User not found!" });
     
     req.userId = user._id;

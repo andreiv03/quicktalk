@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 
-import { SystemContext } from "../contexts/system-context";
 import { UsersContext } from "../contexts/users-context";
 import handlers from "../utils/handlers";
 import type { RegisterFormDataInterface as FormData } from "../interfaces/auth-interfaces";
@@ -19,7 +18,6 @@ const formDataInitialState: FormData = {
 };
 
 const Register: React.FC<PropsInterface> = ({ setAuth }) => {
-  const { createNewToast } = useContext(SystemContext);
   const { token: [, setToken] } = useContext(UsersContext);
 
   const [formData, setFormData] = useState<FormData>(formDataInitialState);
@@ -64,7 +62,7 @@ const Register: React.FC<PropsInterface> = ({ setAuth }) => {
       setToken(data.accessToken);
       localStorage.setItem("authenticated", "true");
     } catch (error: any) {
-      return createNewToast(error, "error");
+      return alert(error.response.data.message);
     }
   }
 
@@ -81,7 +79,7 @@ const Register: React.FC<PropsInterface> = ({ setAuth }) => {
                 type="text"
                 id="username"
                 name="username"
-                autoComplete="username"
+                autoComplete="off"
                 placeholder=" "
                 value={formData.username}
                 onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}
@@ -95,7 +93,7 @@ const Register: React.FC<PropsInterface> = ({ setAuth }) => {
                 type="email"
                 id="email"
                 name="email"
-                autoComplete="email"
+                autoComplete="off"
                 placeholder=" "
                 value={formData.email}
                 onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}
@@ -108,7 +106,7 @@ const Register: React.FC<PropsInterface> = ({ setAuth }) => {
                 type={isPasswordVisible ? "text" : "password"}
                 id="password"
                 name="password"
-                autoComplete="new-password"
+                autoComplete="off"
                 placeholder=" "
                 value={formData.password}
                 onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}

@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { RiLogoutCircleLine } from "react-icons/ri";
 
-import { SystemContext } from "../contexts/system-context";
 import { UsersContext, userInitialState } from "../contexts/users-context";
 import { ChannelsContext } from "../contexts/channels-context";
 import socket from "../services/socket";
@@ -19,7 +18,6 @@ const formDataInitialState: Omit<ChannelInterface, "_id"> = {
 };
 
 const Sidebar: React.FC = () => {
-  const { createNewToast } = useContext(SystemContext);
   const { token: [token, setToken], user: [user, setUser] } = useContext(UsersContext);
   const { currentChannel: [currentChannel, setCurrentChannel], publicChannels } = useContext(ChannelsContext);
 
@@ -49,7 +47,7 @@ const Sidebar: React.FC = () => {
       setIsModalOpen(false);
       setFormData(formDataInitialState);
     } catch (error: any) {
-      return createNewToast(error, "error");
+      return alert(error.response.data.message);
     }
   }
 
@@ -64,7 +62,7 @@ const Sidebar: React.FC = () => {
       setIsModalOpen(false);
       localStorage.removeItem("authenticated");
     } catch (error: any) {
-      return createNewToast(error, "error");
+      return alert(error.response.data.message);
     }
   }
 

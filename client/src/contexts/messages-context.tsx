@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
 
-import { SystemContext } from "./system-context";
 import { UsersContext } from "./users-context";
 import { ChannelsContext } from "./channels-context";
 import socket from "../services/socket";
@@ -13,7 +12,6 @@ interface ProviderStateInterface {
 export const MessagesContext = createContext<ProviderStateInterface>({} as ProviderStateInterface);
 
 export const MessagesProvider: React.FC = ({ children }) => {
-  const { createNewToast } = useContext(SystemContext);
   const { token: [token] } = useContext(UsersContext);
   const { currentChannel: [currentChannel] } = useContext(ChannelsContext);
 
@@ -28,12 +26,12 @@ export const MessagesProvider: React.FC = ({ children }) => {
         const { data } = await messagesService.getMessages(token, currentChannel._id);
         setMessages(data);
       } catch (error: any) {
-        return createNewToast(error, "error");
+        return alert(error.response.data.message);
       }
     }
 
     getMessages();
-  }, [token, currentChannel, createNewToast]);
+  }, [token, currentChannel]);
 
   useEffect(() => {
     socket.on("send_message", (newMessage: MessageInterface) => {

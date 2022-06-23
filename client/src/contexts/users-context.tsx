@@ -1,6 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
-
-import { SystemContext } from "./system-context";
+import { createContext, useState, useEffect } from "react";
 import type { UserInterface } from "../interfaces/users-interfaces";
 
 interface ProviderStateInterface {
@@ -17,8 +15,6 @@ export const userInitialState: UserInterface = {
 export const UsersContext = createContext<ProviderStateInterface>({} as ProviderStateInterface);
 
 export const UsersProvider: React.FC = ({ children }) => {
-  const { createNewToast } = useContext(SystemContext);
-
   const [token, setToken] = useState("");
   const [user, setUser] = useState<UserInterface>(userInitialState);
 
@@ -33,12 +29,12 @@ export const UsersProvider: React.FC = ({ children }) => {
         setToken(data.accessToken);
         setTimeout(() => getAccesToken, 1000 * 60 * 10); // 10 minutes
       } catch (error: any) {
-        return createNewToast(error, "error");
+        return alert(error.response.data.message);
       }
     }
 
     getAccesToken();
-  }, [createNewToast]);
+  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -49,12 +45,12 @@ export const UsersProvider: React.FC = ({ children }) => {
         const { data } = await usersService.getCurrentUser(token);
         setUser(data);
       } catch (error: any) {
-        return createNewToast(error, "error");
+        return alert(error.response.data.message);
       }
     }
 
     getUser();
-  }, [token, createNewToast]);
+  }, [token]);
 
   const state: ProviderStateInterface = {
     token: [token, setToken],
