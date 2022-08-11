@@ -8,8 +8,7 @@
     "server": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-prebuild": "cd client && npm ci",
-    "heroku-postbuild": "npm run build"
+    "heroku-prebuild": "cd client && npm ci && npm run build"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
