@@ -9,7 +9,6 @@ import routes from "./api/routes";
 import socket from "./connections/socket";
 import connectToMongoDB from "./connections/mongoose";
 
-console.log(CLIENT_URL);
 const app = express();
 const options = { credentials: true, origin: CLIENT_URL };
 

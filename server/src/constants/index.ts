@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== "production") dotenv.config();
 
 const PORT = process.env.PORT || "5000";
 const CLIENT_URL =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV !== "production"
     ? "http://localhost:3000"
     : "https://quicktalk-client.vercel.app";
 const MONGODB_URI = process.env.MONGODB_URI;
