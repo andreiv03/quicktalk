@@ -5,7 +5,7 @@ export default axios.create({
   baseURL:
     process.env.NODE_ENV === "development"
       ? "http://localhost:5000/api"
-      : "https://quicktalk-server.vercel.app/api",
+      : "https://quicktalk-server.onrender.com/api",
   headers: {
     "Content-Type": "application/json"
   }

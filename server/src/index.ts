@@ -28,5 +28,3 @@ httpServer
     console.log(`Server is running on port ${PORT}`);
   })
   .on("error", () => process.exit(1));
-
-export default httpServer;
