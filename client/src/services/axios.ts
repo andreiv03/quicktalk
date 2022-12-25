@@ -5,7 +5,7 @@ export default axios.create({
   baseURL:
     process.env.NODE_ENV === "development"
       ? "http://localhost:5000/api"
-      : "https://quicktalk-andreiv03.herokuapp.com/api",
+      : `${process.env.SERVER_URL!}/api`,
   headers: {
     "Content-Type": "application/json"
   }
