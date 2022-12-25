@@ -1,15 +1,10 @@
 {
   "name": "server",
-  "homepage": "https://quicktalk-andreiv03.herokuapp.com/",
   "private": true,
   "scripts": {
-    "build": "tsc && cd client && npm run build",
+    "build": "tsc",
     "start": "node dist/index.js",
-    "server": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
-    "client": "cd client && npm start",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-prebuild": "cd client && NPM_CONFIG_PRODUCTION=false npm ci",
-    "heroku-postbuild": "npm run build"
+    "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\""
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
