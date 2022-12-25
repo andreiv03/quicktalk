@@ -5,7 +5,7 @@ export default axios.create({
   baseURL:
     process.env.NODE_ENV === "development"
       ? "http://localhost:5000/api"
-      : `${process.env.REACT_APP_SERVER_URL!}/api`,
+      : "https://quicktalk-server.vercel.app/api",
   headers: {
     "Content-Type": "application/json"
   }
