@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-if (process.env.NODE_ENV !== "production") dotenv.config();
+dotenv.config();
 
 const PORT = process.env.PORT || "5000";
 const CLIENT_URL = process.env.CLIENT_URL;
