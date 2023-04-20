@@ -1,15 +1,12 @@
 import { Router } from "express";
 
-import authRoutes from "./auth-routes";
-import usersRoutes from "./users-routes";
-import channelsRoutes from "./channels-routes";
-import messagesRoutes from "./messages-routes";
+import { authRouter } from "api/routes/auth.routes";
+import { conversationsRouter } from "api/routes/conversations.routes";
+import { messagesRouter } from "api/routes/messages.routes";
+import { usersRouter } from "api/routes/users.routes";
 
-const router: Router = Router();
-
-router.use("/api/auth", authRoutes);
-router.use("/api/users", usersRoutes);
-router.use("/api/channels", channelsRoutes);
-router.use("/api/messages", messagesRoutes);
-
-export default router;
+export const router = Router();
+router.use("/api/auth", authRouter);
+router.use("/api/conversations", conversationsRouter);
+router.use("/api/messages", messagesRouter);
+router.use("/api/users", usersRouter);

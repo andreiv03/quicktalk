@@ -2,10 +2,16 @@
   --foreground-one: #e8e8e9;
   --foreground-two: #8c8d91;
   --foreground-three: #5a5a71;
+
   --background-one: #1d1e26;
   --background-two: #23252d;
   --background-three: #2a2b36;
+
   --stroke: #2e2e38;
+
+  --accent: #5c61ed;
+  --light-accent: #494c89;
+  --dark-accent: #4449ce;
 
   --green-foreground: #6cb8a8;
   --green-background: #1e252c;
@@ -18,10 +24,6 @@
   --orange-foreground: #dba550;
   --orange-background: #2b2829;
   --orange-stroke: #685336;
-
-  --accent: #5c61ed;
-  --light-accent: #3f405c;
-  --dark-accent: #4449ce;
 }
 
 *,
@@ -35,16 +37,14 @@
 html,
 body,
 input,
-textarea,
 button {
   color: var(--foreground-one);
-  font-family: "Poppins", Arial, sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 16px;
   letter-spacing: 0.25px;
 }
 
 input,
-textarea,
 button {
   background: none;
   border: none;
@@ -67,7 +67,7 @@ body {
 
 #root {
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 // Poppins

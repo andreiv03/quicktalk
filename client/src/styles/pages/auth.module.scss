@@ -1,5 +1,5 @@
 .page {
-  min-height: 100vh;
+  height: 100vh;
   background: var(--background-one);
   display: flex;
   align-items: center;
@@ -9,7 +9,6 @@
     margin: 0 auto;
 
     .content {
-      height: fit-content;
       padding: 1rem;
 
       h1 {
@@ -55,7 +54,7 @@
         font-size: 0.8rem;
       }
 
-      .form {
+      form {
         width: 100%;
         margin: 1.75rem 0 2rem;
         display: flex;
@@ -76,7 +75,7 @@
             font-size: 1rem;
             font-weight: 600;
 
-            &[type="password"] {
+            &[id="password"] {
               padding-right: 3.75rem;
             }
 
@@ -112,7 +111,7 @@
             }
           }
 
-          .show_button {
+          .show {
             position: absolute;
             top: 50%;
             right: 1.25rem;

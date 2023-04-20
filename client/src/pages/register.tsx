@@ -1,135 +1,143 @@
-import { useContext, useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 
-import { UsersContext } from "../contexts/users-context";
-import handlers from "../utils/handlers";
-import type { RegisterFormDataInterface as FormData } from "../interfaces/auth-interfaces";
+import { useAuthContext } from "contexts/auth.context";
+import { getPasswordStrength, validateEmail } from "utils/helpers";
 
-import styles from "../styles/pages/auth.module.scss";
+import styles from "styles/pages/auth.module.scss";
 
-interface PropsInterface {
-  setAuth: React.Dispatch<React.SetStateAction<string>>;
-};
+const Register: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
 
-const formDataInitialState: FormData = {
-  email: "",
-  password: "",
-  username: ""
-};
-
-const Register: React.FC<PropsInterface> = ({ setAuth }) => {
-  const { token: [, setToken] } = useContext(UsersContext);
-
-  const [formData, setFormData] = useState<FormData>(formDataInitialState);
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
 
-  useEffect(() => {
-    if (!formData.email) return;
-
-    const checkEmailValidity = async () => {
-      const { default: helpers } = await import("../utils/helpers");
-      setIsEmailValid(helpers.checkEmailValidity(formData.email));
-    }
-
-    checkEmailValidity();
-  }, [formData.email]);
+  const authContext = useAuthContext();
 
   useEffect(() => {
-    if (!formData.password) return;
+    if (!email) return;
+    setIsEmailValid(validateEmail(email));
+  }, [email]);
 
-    const checkPasswordStrength = async () => {
-      const { default: helpers } = await import("../utils/helpers");
-      setPasswordStrength(helpers.checkPasswordStrength(formData.password));
-    }
-
-    checkPasswordStrength();
-  }, [formData.password]);
+  useEffect(() => {
+    if (!password) return;
+    setPasswordStrength(getPasswordStrength(password));
+  }, [password]);
 
   const isFormDisabled = () => {
-    if (!formData.email || !formData.password || !formData.username) return true;
+    if (!email) return true;
+    if (!password) return true;
+    if (!username) return true;
     if (!isEmailValid) return true;
     return false;
-  }
+  };
 
-  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const submitForm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      const { default: authService } = await import("../services/auth-service");
-      const { data } = await authService.register(formData);
-      setToken(data.accessToken);
-      localStorage.setItem("authenticated", "true");
+      const formData = {
+        email,
+        password,
+        username
+      };
+
+      setEmail("");
+      setPassword("");
+      setUsername("");
+
+      authContext.authenticate(formData);
     } catch (error: any) {
-      return alert(error.response.data.message);
+      alert(error.response.data.message);
     }
-  }
+  };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.wrapper}>
-        <div className={styles.content}>
+    <div className={styles["page"]}>
+      <div className={styles["wrapper"]}>
+        <div className={styles["content"]}>
           <h1>Create an account</h1>
           <p>Connect with friends and the world around you. It's quick and easy!</p>
-        
-          <form className={styles.form} onSubmit={handleFormSubmit} noValidate>
-            <div className={styles.field}>
+
+          <form
+            noValidate
+            onSubmit={submitForm}
+          >
+            <div className={styles["field"]}>
               <input
-                type="text"
-                id="username"
-                name="username"
-                autoComplete="off"
-                placeholder=" "
-                value={formData.username}
-                onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}
+                autoComplete="username"
                 autoFocus
+                id="username"
+                onChange={(event) => setUsername(event.target.value.toLowerCase())}
+                placeholder=" "
+                type="text"
+                value={username}
               />
               <label htmlFor="username">Username</label>
             </div>
 
-            <div className={styles.field}>
+            <div className={styles["field"]}>
               <input
-                type="email"
+                autoComplete="email"
                 id="email"
-                name="email"
-                autoComplete="off"
+                onChange={(event) => setEmail(event.target.value)}
                 placeholder=" "
-                value={formData.email}
-                onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}
+                type="email"
+                value={email}
               />
               <label htmlFor="email">Email</label>
             </div>
 
-            <div className={styles.field}>
+            <div className={styles["field"]}>
               <input
-                type={isPasswordVisible ? "text" : "password"}
+                autoComplete="current-password"
                 id="password"
-                name="password"
-                autoComplete="off"
+                onChange={(event) => setPassword(event.target.value)}
                 placeholder=" "
-                value={formData.password}
-                onChange={event => handlers.handleFormDataChange(event.target.name, event.target.value, setFormData)}
+                type={isPasswordVisible ? "text" : "password"}
+                value={password}
               />
 
               <label htmlFor="password">
-                Password {formData.password && <span className={styles[passwordStrength.replace("very ", "")]}>({passwordStrength})</span>}
+                Password{" "}
+                {password && (
+                  <span className={styles[passwordStrength.replace("very ", "")]}>
+                    ({passwordStrength})
+                  </span>
+                )}
               </label>
 
-              <div className={styles.show_button} onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
+              <div
+                className={styles["show"]}
+                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+              >
                 {isPasswordVisible ? <RiEyeOffFill /> : <RiEyeFill />}
               </div>
             </div>
 
-            <button type="submit" disabled={isFormDisabled()}>Sign up</button>
+            <button
+              disabled={isFormDisabled()}
+              type="submit"
+            >
+              Sign up
+            </button>
           </form>
 
-          <h3>Already have an account? <span onClick={() => setAuth("login")}>Sign in</span></h3>
-          <h4>By creating an account you agree to the <span>Terms and Conditions</span> and <span>Privacy Policy</span></h4>
+          <h3>
+            Already have an account?{" "}
+            <span onClick={() => authContext.setType("LOGIN")}>Sign in</span>
+          </h3>
+          <h4>
+            By creating an account you agree to the <span>Terms and Conditions</span> and{" "}
+            <span>Privacy Policy</span>
+          </h4>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Register;

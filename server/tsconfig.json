@@ -1,13 +1,58 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "dist",
-    "rootDir": "src",
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "alwaysStrict": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "useUnknownInCatchVariables": true,
+
+    "baseUrl": "./src",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "paths": {
+      "api/*": ["api/*"],
+      "types/*": ["types/*"],
+      "utils/*": ["utils/*"]
+    },
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+
+    "declaration": true,
+    "noEmit": false,
+    "outDir": "./dist",
+    "preserveValueImports": false,
+    "removeComments": true,
+    "sourceMap": true,
+
+    "allowJs": true,
+    "checkJs": true,
+    "maxNodeModuleJsDepth": 0,
+
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    "lib": ["ESNext"],
+    "target": "ES5",
+
+    "skipLibCheck": false
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/types/*.ts", "node_modules", ".vscode"]
+  "exclude": ["./dist", "./node_modules", "./src/types/*.ts"],
+  "include": ["./src"]
 }

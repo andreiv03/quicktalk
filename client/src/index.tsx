@@ -1,40 +1,28 @@
-import React, { useContext, useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import { lazy, StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
-import { UsersProvider, UsersContext } from "./contexts/users-context";
-import { ChannelsProvider } from "./contexts/channels-context";
-import { MessagesProvider } from "./contexts/messages-context";
+import { AuthContext, AuthContextProvider } from "contexts/auth.context";
+import { ConversationsContextProvider } from "contexts/conversations.context";
+import { MessagesContextProvider } from "contexts/messages.context";
 
-import "./styles/globals.scss";
-import Login from "./pages/login";
-import Register from "./pages/register";
-import Home from "./pages/home";
+import "styles/globals.scss";
+const App = lazy(() => import("pages/app"));
+const Login = lazy(() => import("pages/login"));
+const Register = lazy(() => import("pages/register"));
 
-const App: React.FC = () => {
-  const { token: [token] } = useContext(UsersContext);
-  const [auth, setAuth] = useState("login");
-
-  useEffect(() => {
-    setAuth("login");
-  }, [token]);
-
-  if (!token) {
-    if (auth === "login") return <Login setAuth={setAuth} />
-    else return <Register setAuth={setAuth} />
-  }
-  
-  return <Home />;
-}
-
-ReactDOM.render(
-  <React.StrictMode>
-    <UsersProvider>
-      <ChannelsProvider>
-        <MessagesProvider>
-          <App />
-        </MessagesProvider>
-      </ChannelsProvider>
-    </UsersProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+const root = createRoot(document.getElementById("root") as HTMLElement);
+root.render(
+  <StrictMode>
+    <AuthContextProvider>
+      <ConversationsContextProvider>
+        <MessagesContextProvider>
+          <AuthContext.Consumer>
+            {({ accessToken, type }) => (
+              <>{accessToken ? <App /> : <>{type === "LOGIN" ? <Login /> : <Register />}</>}</>
+            )}
+          </AuthContext.Consumer>
+        </MessagesContextProvider>
+      </ConversationsContextProvider>
+    </AuthContextProvider>
+  </StrictMode>
 );

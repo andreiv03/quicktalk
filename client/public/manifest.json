@@ -1,6 +1,6 @@
 {
-  "short_name": "quicktalk",
-  "name": "QuickTalk",
+  "background_color": "#1d1e26",
+  "display": "standalone",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +18,8 @@
       "type": "image/png"
     }
   ],
+  "name": "QuickTalk",
+  "short_name": "quicktalk",
   "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1d1e26"
 }

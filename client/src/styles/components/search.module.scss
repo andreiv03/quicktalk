@@ -1,0 +1,132 @@
+.search {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  width: min(350px, calc(100vw - 2rem));
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: var(--background-two);
+  opacity: 0;
+  visibility: hidden;
+  transition: 100ms ease-in;
+
+  &.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  form {
+    label {
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .input_container {
+      position: relative;
+
+      input {
+        width: 100%;
+        padding: 0.5rem 1rem 0.5rem 2rem;
+        border-radius: 0.25rem;
+        background: var(--background-one);
+        font-size: 0.9rem;
+      }
+
+      &::before {
+        content: "#";
+        position: absolute;
+        top: 50%;
+        left: 0.75rem;
+        transform: translateY(-50%);
+        color: var(--foreground-one);
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .users {
+    max-height: 150px;
+    margin-top: 1rem;
+    border-radius: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .user {
+      position: relative;
+      padding: 0.5rem 1rem 0.5rem 2rem;
+      background: var(--background-three);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 100ms ease-in;
+
+      &:hover {
+        background: var(--background-one);
+      }
+
+      &:first-child {
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+      }
+
+      &::before {
+        content: "#";
+        position: absolute;
+        top: 50%;
+        left: 0.75rem;
+        transform: translateY(-50%);
+        color: var(--foreground-one);
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  button {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    background: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 100ms ease-in;
+
+    &:hover {
+      background: var(--dark-accent);
+    }
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9;
+  background: var(--background-one);
+  opacity: 0;
+  visibility: hidden;
+  transition: 100ms ease-in;
+
+  &.open {
+    opacity: 0.5;
+    visibility: visible;
+  }
+}

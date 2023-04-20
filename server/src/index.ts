@@ -1,30 +1,29 @@
-import express from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
-import http from "http";
-import { Server } from "socket.io";
+import cors from "cors";
+import express from "express";
+import { createServer } from "http";
 
-import { PORT, CLIENT_URL } from "./constants";
-import routes from "./api/routes";
-import socket from "./connections/socket";
-import connectToMongoDB from "./connections/mongoose";
+import { router } from "api/routes";
+import { establishMongoDBConnection } from "utils/mongodb";
 
-const app = express();
+const DEVELOPMENT_URL = "http://localhost:3000";
+const PRODUCTION_URL = "";
+const CLIENT_URL = process.env["NODE_ENV"] === "production" ? PRODUCTION_URL : DEVELOPMENT_URL;
+const PORT = process.env["NODE_ENV"] === "production" ? process.env["PORT"] : "5000";
+
 const options = { credentials: true, origin: CLIENT_URL };
-
-app.use(express.json());
-app.use(cors(options));
+const app = express();
 app.use(cookieParser());
-app.use(routes);
-app.get("*", (req, res) => res.send("Server is running!"));
+app.use(cors(options));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(router);
+app.get("*", (_req, res) => res.send("Server is running!"));
 
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, { cors: options });
-
-httpServer
+const server = createServer(app);
+server
   .listen(PORT, () => {
-    socket(io);
-    connectToMongoDB();
+    establishMongoDBConnection();
     console.log(`Server is running on port ${PORT}`);
   })
   .on("error", () => process.exit(1));
