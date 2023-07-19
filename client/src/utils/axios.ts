@@ -1,12 +1,13 @@
 import axios from "axios";
+import { constants } from "utils/constants";
 
-const DEVELOPMENT_URL = "http://localhost:5000";
-const PRODUCTION_URL = "";
+const SERVER_URL =
+	process.env["NODE_ENV"] === "production" ? constants.PRODUCTION_URL : constants.DEVELOPMENT_URL;
 
 export default axios.create({
-  baseURL: `${process.env["NODE_ENV"] === "production" ? PRODUCTION_URL : DEVELOPMENT_URL}/api`,
-  headers: {
-    "Content-Type": "application/json"
-  },
-  withCredentials: true
+	baseURL: `${SERVER_URL}/api`,
+	headers: {
+		"Content-Type": "application/json"
+	},
+	withCredentials: true
 });

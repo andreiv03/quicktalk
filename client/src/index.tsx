@@ -12,17 +12,17 @@ const Register = lazy(() => import("pages/register"));
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(
-  <StrictMode>
-    <AuthContextProvider>
-      <ConversationsContextProvider>
-        <MessagesContextProvider>
-          <AuthContext.Consumer>
-            {({ accessToken, type }) => (
-              <>{accessToken ? <App /> : <>{type === "LOGIN" ? <Login /> : <Register />}</>}</>
-            )}
-          </AuthContext.Consumer>
-        </MessagesContextProvider>
-      </ConversationsContextProvider>
-    </AuthContextProvider>
-  </StrictMode>
+	<StrictMode>
+		<AuthContextProvider>
+			<ConversationsContextProvider>
+				<MessagesContextProvider>
+					<AuthContext.Consumer>
+						{({ accessToken, type }) => (
+							<>{accessToken ? <App /> : <>{type === "LOGIN" ? <Login /> : <Register />}</>}</>
+						)}
+					</AuthContext.Consumer>
+				</MessagesContextProvider>
+			</ConversationsContextProvider>
+		</AuthContextProvider>
+	</StrictMode>
 );

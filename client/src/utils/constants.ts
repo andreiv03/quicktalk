@@ -1,6 +1,6 @@
 export const constants = {
-	JWT_SECRET: process.env["JWT_SECRET"] as string,
-	MONGODB_URI: process.env["MONGODB_URI"] as string
+	DEVELOPMENT_URL: "http://localhost:5000",
+	PRODUCTION_URL: ""
 };
 
 Object.entries(constants).forEach(([key, value]) => {
