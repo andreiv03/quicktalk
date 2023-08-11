@@ -10,7 +10,11 @@ import type { Message } from "services/messages.service";
 
 import styles from "styles/components/chat.module.scss";
 
-const Chat: React.FC = () => {
+interface Props {
+	setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 	const messagesContainerRef = useRef({} as HTMLDivElement);
 	const [messageText, setMessageText] = useState("");
 
@@ -47,7 +51,10 @@ const Chat: React.FC = () => {
 				</div>
 
 				<div className={styles["column"]}>
-					<div className={styles["button"]}>
+					<div
+						className={styles["button"]}
+						onClick={() => setIsMenuOpen(true)}
+					>
 						<HiOutlineDotsVertical />
 					</div>
 				</div>

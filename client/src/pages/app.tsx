@@ -3,11 +3,14 @@ import { useConversationsContext } from "contexts/conversations.context";
 
 import styles from "styles/pages/app.module.scss";
 const Chat = lazy(() => import("components/chat"));
+const Menu = lazy(() => import("components/menu"));
 const Search = lazy(() => import("components/search"));
 const Sidebar = lazy(() => import("components/sidebar"));
 
 const App: React.FC = () => {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 	const conversationsContext = useConversationsContext();
 
 	return (
@@ -20,7 +23,13 @@ const App: React.FC = () => {
 				/>
 
 				{conversationsContext.conversation._id ? (
-					<Chat />
+					<>
+						<Chat setIsMenuOpen={setIsMenuOpen} />
+						<Menu
+							isMenuOpen={isMenuOpen}
+							setIsMenuOpen={setIsMenuOpen}
+						/>
+					</>
 				) : (
 					<div className={styles["idle"]}>
 						<img

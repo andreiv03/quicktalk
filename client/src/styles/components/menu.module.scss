@@ -1,0 +1,63 @@
+.menu {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	z-index: 20;
+	transform: translate(-50%, -50%);
+	width: min(350px, calc(100vw - 2rem));
+	padding: 1.5rem;
+	border-radius: 0.5rem;
+	background: var(--background-two);
+	opacity: 0;
+	visibility: hidden;
+	transition: 100ms ease-in;
+
+	&.open {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	button {
+		width: 100%;
+		margin-top: 1rem;
+		padding: 0.5rem 1rem;
+		border-radius: 0.25rem;
+		background: var(--accent);
+		font-size: 0.9rem;
+		font-weight: 500;
+		text-transform: capitalize;
+		cursor: pointer;
+		transition: 100ms ease-in;
+
+		&:hover {
+			background: var(--dark-accent);
+		}
+
+		&:not(:last-child) {
+			margin-top: unset;
+			background: var(--background-one);
+
+			&:hover {
+				background: var(--background-three);
+			}
+		}
+	}
+}
+
+.overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 19;
+	background: var(--background-one);
+	opacity: 0;
+	visibility: hidden;
+	transition: 100ms ease-in;
+
+	&.open {
+		opacity: 0.5;
+		visibility: visible;
+	}
+}
