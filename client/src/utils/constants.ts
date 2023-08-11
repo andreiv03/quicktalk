@@ -1,6 +1,6 @@
 export const constants = {
-	DEVELOPMENT_URL: "http://localhost:5000/",
-	PRODUCTION_URL: "https://quicktalk-server.onrender.com/"
+	DEVELOPMENT_URL: "http://localhost:5000/api",
+	PRODUCTION_URL: "https://quicktalk-server.onrender.com/api"
 };
 
 Object.entries(constants).forEach(([key, value]) => {
