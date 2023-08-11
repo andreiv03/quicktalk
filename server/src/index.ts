@@ -5,12 +5,12 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 import { router } from "api/routes";
+import { constants } from "utils/constants";
 import { establishMongoDBConnection } from "utils/mongodb";
 import { establishSocketIOConnection } from "utils/socketio";
 
-const DEVELOPMENT_URL = "http://localhost:3000";
-const PRODUCTION_URL = "";
-const CLIENT_URL = process.env["NODE_ENV"] === "production" ? PRODUCTION_URL : DEVELOPMENT_URL;
+const CLIENT_URL =
+	process.env["NODE_ENV"] === "production" ? constants.PRODUCTION_URL : constants.DEVELOPMENT_URL;
 const PORT = process.env["NODE_ENV"] === "production" ? process.env["PORT"] : "5000";
 
 const corsOptions = { credentials: true, origin: CLIENT_URL };
