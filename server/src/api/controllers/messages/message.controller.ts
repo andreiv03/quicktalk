@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
-import { MessagesModel } from "api/models/messages.model";
+
+import { Message } from "api/models/message";
 
 interface ExtendedPostRequest extends Request {
 	body: {
@@ -13,16 +14,16 @@ const POST = async (req: ExtendedPostRequest, res: Response) => {
 	try {
 		const { conversation, sender, text } = req.body;
 		if (!conversation || !sender || !text)
-			return res.status(404).json({ message: "Something went wrong!" });
+			return res.status(404).json({ message: "Missing required fields" });
 
-		const message = await MessagesModel.create({
+		const message = await Message.create({
 			conversation,
 			createdAt: Date.now(),
 			sender,
 			text
 		});
 
-		return res.status(200).json({ _id: message._id });
+		return res.status(201).json({ _id: message._id });
 	} catch (error: any) {
 		return res.status(500).json({ message: error.message });
 	}
@@ -33,6 +34,6 @@ export const messageController = (req: Request, res: Response) => {
 		case "POST":
 			return POST(req, res);
 		default:
-			return res.status(404).json({ message: "API route not found!" });
+			return res.status(405).json({ message: "Method not allowed" });
 	}
 };

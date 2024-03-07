@@ -38,4 +38,4 @@ const schema = new Schema<Message>(
 	}
 );
 
-export const MessagesModel = model<Message>("Messages", schema);
+export const Message = model<Message>("Messages", schema);

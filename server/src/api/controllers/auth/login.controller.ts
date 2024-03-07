@@ -1,7 +1,7 @@
 import { compare } from "bcrypt";
 import type { Request, Response } from "express";
 
-import { UsersModel } from "api/models/users.model";
+import { User } from "api/models/user";
 import { signToken } from "utils/jwt";
 
 interface ExtendedPostRequest extends Request {
@@ -14,21 +14,20 @@ interface ExtendedPostRequest extends Request {
 const POST = async (req: ExtendedPostRequest, res: Response) => {
 	try {
 		const { password, username } = req.body;
-		if (!password || !username)
-			return res.status(406).json({ message: "All fields are required!" });
+		if (!password || !username) return res.status(404).json({ message: "Missing required fields" });
 
-		const user = await UsersModel.findOne({ username }).select("password").lean();
-		if (!user) return res.status(404).json({ message: "User not found!" });
+		const user = await User.findOne({ username }).select("password").lean();
+		if (!user) return res.status(404).json({ message: "User not found" });
 
 		const match = await compare(password, user.password);
-		if (!match) return res.status(403).json({ message: "Incorrect password!" });
+		if (!match) return res.status(401).json({ message: "Incorrect password" });
 
 		const accessToken = await signToken(user._id, "10m");
 		const refreshToken = await signToken(user._id, "7d");
 
 		res.cookie("refreshToken", refreshToken, {
 			httpOnly: true,
-			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+			maxAge: 7 * 24 * 60 * 60 * 1000,
 			path: "/",
 			sameSite: "strict",
 			secure: process.env["NODE_ENV"] !== "development"
@@ -45,6 +44,6 @@ export const loginController = (req: Request, res: Response) => {
 		case "POST":
 			return POST(req, res);
 		default:
-			return res.status(404).json({ message: "API route not found!" });
+			return res.status(405).json({ message: "Method not allowed" });
 	}
 };

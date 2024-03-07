@@ -7,7 +7,7 @@ export interface User {
 	username: string;
 }
 
-const schema = new Schema<User>(
+const schema = new Schema(
 	{
 		email: {
 			required: true,
@@ -32,4 +32,4 @@ const schema = new Schema<User>(
 	}
 );
 
-export const UsersModel = model<User>("Users", schema);
+export const User = model<User>("Users", schema);

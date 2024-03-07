@@ -1,13 +1,11 @@
 import { model, Schema } from "mongoose";
 
-interface Participant {
-	_id: string;
-	username: string;
-}
-
 export interface Conversation {
 	_id: string;
-	participants: Participant[];
+	participants: {
+		_id: string;
+		username: string;
+	}[];
 }
 
 const schema = new Schema<Conversation>(
@@ -35,4 +33,4 @@ const schema = new Schema<Conversation>(
 	}
 );
 
-export const ConversationsModel = model<Conversation>("Conversations", schema);
+export const Conversation = model<Conversation>("Conversations", schema);

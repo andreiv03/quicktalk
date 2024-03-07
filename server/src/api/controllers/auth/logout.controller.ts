@@ -21,6 +21,6 @@ export const logoutController = (req: Request, res: Response) => {
 		case "GET":
 			return GET(req, res);
 		default:
-			return res.status(404).json({ message: "API route not found!" });
+			return res.status(405).json({ message: "Method not allowed" });
 	}
 };

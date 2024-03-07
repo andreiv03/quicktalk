@@ -1,25 +1,26 @@
 import jwt from "jsonwebtoken";
-import { constants } from "utils/constants";
+
+import { config } from "utils/config";
 
 export const signToken = (subject: any, expiresIn: string): Promise<string> => {
 	return new Promise((resolve, reject) => {
-		const data = {
-			sub: subject,
-			iat: Date.now()
-		};
+		const payload = { sub: subject };
+		const options = { expiresIn };
 
-		jwt.sign(data, constants.JWT_SECRET, { expiresIn }, (error, token) => {
-			if (error || !token) return reject(error || "Token not found!");
-			return resolve(token);
+		jwt.sign(payload, config.JWT_SECRET, options, (error, token) => {
+			if (error) return reject(error);
+			if (!token) return reject("Token generation failed");
+			resolve(token);
 		});
 	});
 };
 
-export const verifyToken = (token: string): Promise<string | jwt.JwtPayload> => {
+export const verifyToken = (token: string): Promise<jwt.JwtPayload> => {
 	return new Promise((resolve, reject) => {
-		jwt.verify(token, constants.JWT_SECRET, (error, payload) => {
-			if (error || !payload) return reject(error || "Payload not found!");
-			return resolve(payload);
+		jwt.verify(token, config.JWT_SECRET, (error, decoded) => {
+			if (error) return reject(error);
+			if (!decoded) return reject("Token verification failed");
+			resolve(decoded as jwt.JwtPayload);
 		});
 	});
 };

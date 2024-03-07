@@ -6,7 +6,8 @@ import { messagesRouter } from "api/routes/messages.routes";
 import { usersRouter } from "api/routes/users.routes";
 
 export const router = Router();
-router.use("/api/auth", authRouter);
-router.use("/api/conversations", conversationsRouter);
-router.use("/api/messages", messagesRouter);
-router.use("/api/users", usersRouter);
+
+router.use("/auth", authRouter);
+router.use("/conversations", conversationsRouter);
+router.use("/messages", messagesRouter);
+router.use("/users", usersRouter);

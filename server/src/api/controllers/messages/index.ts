@@ -1,12 +1,13 @@
 import type { Request, Response } from "express";
-import { MessagesModel } from "api/models/messages.model";
+
+import { Message } from "api/models/message";
 
 const GET = async (req: Request, res: Response) => {
 	try {
 		const { conversation } = req.params;
-		if (!conversation) return res.status(404).json({ message: "Something went wrong!" });
+		if (!conversation) return res.status(404).json({ message: "Missing required parameters" });
 
-		const messages = await MessagesModel.find({ conversation })
+		const messages = await Message.find({ conversation })
 			.sort({ updatedAt: 1 })
 			.select("conversation createdAt sender text")
 			.lean();
@@ -22,6 +23,6 @@ export const messagesController = (req: Request, res: Response) => {
 		case "GET":
 			return GET(req, res);
 		default:
-			return res.status(404).json({ message: "API route not found!" });
+			return res.status(405).json({ message: "Method not allowed" });
 	}
 };

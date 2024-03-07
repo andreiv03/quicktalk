@@ -1,16 +1,16 @@
 import type { Request, Response } from "express";
-import { UsersModel } from "api/models/users.model";
+
+import { User } from "api/models/user";
 
 const GET = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
-		if (!username) return res.status(404).json({ message: "Something went wrong!" });
+		if (!username) return res.status(404).json({ message: "Missing required parameters" });
 
-		const usernameRegex = new RegExp(`.*${username}.*`, "i");
-		const users = await UsersModel.aggregate([
+		const users = await User.aggregate([
 			{
 				$match: {
-					username: usernameRegex
+					username: new RegExp(`.*${username}.*`, "i")
 				}
 			},
 			{
@@ -51,6 +51,6 @@ export const usersController = (req: Request, res: Response) => {
 		case "GET":
 			return GET(req, res);
 		default:
-			return res.status(404).json({ message: "API route not found!" });
+			return res.status(405).json({ message: "Method not allowed" });
 	}
 };
