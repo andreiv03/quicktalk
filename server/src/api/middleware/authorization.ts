@@ -19,7 +19,7 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 		const user = await User.findById(payload.sub).select("_id").lean();
 		if (!user) return res.status(404).json({ message: "User not found" });
 
-		req.userId = user._id;
+		req.userId = user._id.toString();
 		return next();
 	} catch (error: any) {
 		return res.status(500).json({ message: error.message });
