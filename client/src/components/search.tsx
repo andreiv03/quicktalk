@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 import { useAuthContext } from "contexts/auth.context";
-import { useConversationsContext } from "contexts/conversations.context";
-import { conversationsService } from "services/conversations.service";
-import { usersService, type User } from "services/users.service";
+import { useConversationContext } from "contexts/conversation.context";
+import { conversationService } from "services/conversation.service";
+import { userService, type User } from "services/user.service";
 
 import styles from "styles/components/search.module.scss";
 
@@ -17,14 +17,14 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 	const [users, setUsers] = useState<User[]>([]);
 
 	const authContext = useAuthContext();
-	const conversationsContext = useConversationsContext();
+	const conversationContext = useConversationContext();
 
 	useEffect(() => {
 		if (!username) return setUsers([]);
 
 		const getUsersByUsername = async () => {
 			try {
-				const { data } = await usersService.getUsersByUsername(authContext.accessToken, username);
+				const { data } = await userService.getUsersByUsername(authContext.accessToken, username);
 				setUsers(data);
 			} catch (error: any) {
 				alert(error.response.data.message);
@@ -42,14 +42,14 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 
 	const openConversation = async (receiverId: string, receiverUsername: string) => {
 		try {
-			const { data } = await conversationsService.getConversation(
+			const { data } = await conversationService.getConversation(
 				authContext.accessToken,
 				receiverId,
 				receiverUsername,
 				authContext.user.username
 			);
-			conversationsContext.setConversation(data);
-			conversationsContext.setCallback(!conversationsContext.callback);
+			conversationContext.setConversation(data);
+			conversationContext.setCallback(!conversationContext.callback);
 			closeSearch();
 		} catch (error: any) {
 			alert(error.response.data.message);

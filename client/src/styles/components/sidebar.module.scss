@@ -6,7 +6,7 @@
 	background: var(--background-one);
 	display: flex;
 	flex-direction: column;
-	transition: 200ms ease-in;
+	transition: 100ms ease-in;
 
 	&.visible {
 		transform: unset;

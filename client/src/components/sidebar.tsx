@@ -2,7 +2,7 @@ import { startTransition, useState } from "react";
 import { RiArrowRightSLine, RiLogoutCircleLine, RiSearchLine } from "react-icons/ri";
 
 import { useAuthContext } from "contexts/auth.context";
-import { useConversationsContext } from "contexts/conversations.context";
+import { useConversationContext } from "contexts/conversation.context";
 import { truncateText } from "utils/helpers";
 
 import styles from "styles/components/sidebar.module.scss";
@@ -15,7 +15,7 @@ const Sidebar: React.FC<Props> = ({ setIsSearchOpen }) => {
 	const [isVisible, setIsVisible] = useState(false);
 
 	const authContext = useAuthContext();
-	const conversationsContext = useConversationsContext();
+	const conversationContext = useConversationContext();
 
 	return (
 		<div className={`${styles["sidebar"]} ${isVisible ? styles["visible"] : ""}`}>
@@ -39,21 +39,21 @@ const Sidebar: React.FC<Props> = ({ setIsSearchOpen }) => {
 
 				<div className={styles["conversations"]}>
 					<div className={styles["title"]}>
-						<h3>Conversations [{conversationsContext.conversations.length}]</h3>
+						<h3>Conversations [{conversationContext.conversations.length}]</h3>
 					</div>
 
-					{conversationsContext.conversations.length > 0 ? (
+					{conversationContext.conversations.length > 0 ? (
 						<div className={styles["container"]}>
-							{conversationsContext.conversations.map((conversation) => (
+							{conversationContext.conversations.map((conversation) => (
 								<div
 									className={`${styles["conversation"]} ${
-										conversationsContext.conversation._id === conversation._id
+										conversationContext.conversation._id === conversation._id
 											? styles["active"]
 											: ""
 									}`}
 									key={conversation._id}
 									onClick={() =>
-										startTransition(() => conversationsContext.joinConversation(conversation))
+										startTransition(() => conversationContext.joinConversation(conversation))
 									}
 								>
 									<div className={styles["avatar"]}>{conversation.name[0]}</div>

@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { useAuthContext } from "contexts/auth.context";
-import { useConversationsContext } from "contexts/conversations.context";
-import { messagesService, type Message } from "services/messages.service";
-import { socket } from "utils/socketio";
+import { useConversationContext } from "contexts/conversation.context";
+import { messageService, type Message } from "services/message.service";
+import { socket } from "utils/socket";
 
-interface MessagesContext {
+interface MessageContext {
 	callback: boolean;
 	setCallback: React.Dispatch<React.SetStateAction<boolean>>;
 	messages: Message[];
@@ -13,32 +13,32 @@ interface MessagesContext {
 	sendMessage: (messageData: Omit<Message, "_id" | "createdAt">) => void;
 }
 
-export const MessagesContext = createContext<MessagesContext>({} as MessagesContext);
+export const MessageContext = createContext<MessageContext>({} as MessageContext);
 
-export const useMessagesContext = () => {
-	const messagesContext = useContext(MessagesContext);
-	if (!messagesContext) throw new Error("Something went wrong with the React Context API!");
-	return messagesContext;
+export const useMessageContext = () => {
+	const messageContext = useContext(MessageContext);
+	if (!messageContext) throw new Error("Something went wrong with the React Context API!");
+	return messageContext;
 };
 
-export const MessagesContextProvider: React.FC<{
+export const MessageContextProvider: React.FC<{
 	children: JSX.Element | JSX.Element[];
 }> = ({ children }) => {
 	const [callback, setCallback] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 
 	const authContext = useAuthContext();
-	const conversationsContext = useConversationsContext();
+	const conversationContext = useConversationContext();
 
 	useEffect(() => {
 		if (!authContext.accessToken) return;
-		if (!conversationsContext.conversation._id) return;
+		if (!conversationContext.conversation._id) return;
 
 		const getMessages = async () => {
 			try {
-				const { data } = await messagesService.getMessages(
+				const { data } = await messageService.getMessages(
 					authContext.accessToken,
-					conversationsContext.conversation._id
+					conversationContext.conversation._id
 				);
 				setMessages(data);
 			} catch (error: any) {
@@ -47,7 +47,7 @@ export const MessagesContextProvider: React.FC<{
 		};
 
 		getMessages();
-	}, [authContext.accessToken, callback, conversationsContext.conversation._id]);
+	}, [authContext.accessToken, conversationContext.conversation._id, callback]);
 
 	useEffect(() => {
 		const handleReceiveMessage = (message: Message) =>
@@ -61,7 +61,7 @@ export const MessagesContextProvider: React.FC<{
 
 	const sendMessage = async (messageData: Omit<Message, "_id" | "createdAt">) => {
 		try {
-			const { data } = await messagesService.sendMessage(authContext.accessToken, messageData);
+			const { data } = await messageService.sendMessage(authContext.accessToken, messageData);
 			socket.emit("send_message", { ...messageData, _id: data._id });
 			setCallback(!callback);
 		} catch (error: any) {
@@ -69,7 +69,7 @@ export const MessagesContextProvider: React.FC<{
 		}
 	};
 
-	const state: MessagesContext = {
+	const state: MessageContext = {
 		callback,
 		setCallback,
 		messages,
@@ -77,5 +77,5 @@ export const MessagesContextProvider: React.FC<{
 		sendMessage
 	};
 
-	return <MessagesContext.Provider value={state}>{children}</MessagesContext.Provider>;
+	return <MessageContext.Provider value={state}>{children}</MessageContext.Provider>;
 };

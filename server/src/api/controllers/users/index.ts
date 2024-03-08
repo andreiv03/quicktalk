@@ -1,9 +1,13 @@
 import type { Request, Response } from "express";
+import { Types } from "mongoose";
 
 import { User } from "api/models/user";
 
 const GET = async (req: Request, res: Response) => {
 	try {
+		const userId = req.userId;
+		if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
 		const { username } = req.params;
 		if (!username) return res.status(404).json({ message: "Missing required parameters" });
 
@@ -15,7 +19,7 @@ const GET = async (req: Request, res: Response) => {
 			},
 			{
 				$match: {
-					_id: { $ne: req.userId }
+					_id: { $ne: new Types.ObjectId(userId) }
 				}
 			},
 			{

@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { useAuthContext } from "contexts/auth.context";
-import { conversationsService, type Conversation } from "services/conversations.service";
-import { socket } from "utils/socketio";
+import { conversationService, type Conversation } from "services/conversation.service";
+import { socket } from "utils/socket";
 
-interface ConversationsContext {
+interface ConversationContext {
 	callback: boolean;
 	setCallback: React.Dispatch<React.SetStateAction<boolean>>;
 	conversation: Conversation;
@@ -14,15 +14,15 @@ interface ConversationsContext {
 	joinConversation: (newConversation: Conversation) => void;
 }
 
-export const ConversationsContext = createContext<ConversationsContext>({} as ConversationsContext);
+export const ConversationContext = createContext<ConversationContext>({} as ConversationContext);
 
-export const useConversationsContext = () => {
-	const conversationsContext = useContext(ConversationsContext);
-	if (!conversationsContext) throw new Error("Something went wrong with the React Context API!");
-	return conversationsContext;
+export const useConversationContext = () => {
+	const conversationContext = useContext(ConversationContext);
+	if (!conversationContext) throw new Error("Something went wrong with the React Context API!");
+	return conversationContext;
 };
 
-export const ConversationsContextProvider: React.FC<{
+export const ConversationContextProvider: React.FC<{
 	children: JSX.Element | JSX.Element[];
 }> = ({ children }) => {
 	const [callback, setCallback] = useState(false);
@@ -36,7 +36,7 @@ export const ConversationsContextProvider: React.FC<{
 
 		const getConversations = async () => {
 			try {
-				const { data } = await conversationsService.getConversations(authContext.accessToken);
+				const { data } = await conversationService.getConversations(authContext.accessToken);
 				setConversations(data);
 			} catch (error: any) {
 				alert(error.response.data.message);
@@ -53,7 +53,7 @@ export const ConversationsContextProvider: React.FC<{
 		setConversation(newConversation);
 	};
 
-	const state: ConversationsContext = {
+	const state: ConversationContext = {
 		callback,
 		setCallback,
 		conversation,
@@ -63,5 +63,5 @@ export const ConversationsContextProvider: React.FC<{
 		joinConversation
 	};
 
-	return <ConversationsContext.Provider value={state}>{children}</ConversationsContext.Provider>;
+	return <ConversationContext.Provider value={state}>{children}</ConversationContext.Provider>;
 };

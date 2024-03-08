@@ -1,7 +1,9 @@
 import { lazy, useState } from "react";
-import { useConversationsContext } from "contexts/conversations.context";
+
+import { useConversationContext } from "contexts/conversation.context";
 
 import styles from "styles/pages/app.module.scss";
+
 const Chat = lazy(() => import("components/chat"));
 const Menu = lazy(() => import("components/menu"));
 const Search = lazy(() => import("components/search"));
@@ -11,18 +13,19 @@ const App: React.FC = () => {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-	const conversationsContext = useConversationsContext();
+	const conversationContext = useConversationContext();
 
 	return (
 		<div className={styles["page"]}>
 			<div className={styles["container"]}>
 				<Sidebar setIsSearchOpen={setIsSearchOpen} />
+
 				<Search
 					isSearchOpen={isSearchOpen}
 					setIsSearchOpen={setIsSearchOpen}
 				/>
 
-				{conversationsContext.conversation._id ? (
+				{conversationContext.conversation._id ? (
 					<>
 						<Chat setIsMenuOpen={setIsMenuOpen} />
 						<Menu

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { authService, type AuthData } from "services/auth.service";
-import { usersService, type User } from "services/users.service";
+import { userService, type User } from "services/user.service";
 
 interface AuthContext {
 	accessToken: string;
@@ -46,7 +46,7 @@ export const AuthContextProvider: React.FC<{
 			try {
 				const { data } = await authService.refreshToken();
 				setAccessToken(data.accessToken);
-				setTimeout(() => getAccessToken, 1000 * 60 * 10); // 10 minutes
+				setTimeout(() => getAccessToken, 10 * 60 * 1000);
 			} catch (error: any) {
 				alert(error.response.data.message);
 			}
@@ -60,7 +60,7 @@ export const AuthContextProvider: React.FC<{
 
 		const getUser = async () => {
 			try {
-				const { data } = await usersService.getUser(accessToken);
+				const { data } = await userService.getUser(accessToken);
 				setUser(data);
 			} catch (error: any) {
 				alert(error.response.data.message);

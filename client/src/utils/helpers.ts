@@ -1,3 +1,15 @@
+export const formatDate = (dateString: string) => {
+	const date = new Date(dateString);
+
+	const hours = date.getHours() % 12;
+	const hoursString = `${hours < 10 ? 0 : ""}${hours}`;
+
+	const minutes = date.getMinutes();
+	const minutesString = `${minutes < 10 ? 0 : ""}${minutes}`;
+
+	return `${hoursString}:${minutesString} ${date.getHours() > 12 ? "PM" : "AM"}`;
+};
+
 export const getPasswordStrength = (password: string) => {
 	const lowercaseLettersRegex = /[a-z]/;
 	const uppercaseLettersRegex = /[A-Z]/;

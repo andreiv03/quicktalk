@@ -1,12 +1,12 @@
-import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { RiSendPlaneFill } from "react-icons/ri";
 
 import { useAuthContext } from "contexts/auth.context";
-import { useConversationsContext } from "contexts/conversations.context";
-import { useMessagesContext } from "contexts/messages.context";
-import type { Message } from "services/messages.service";
+import { useConversationContext } from "contexts/conversation.context";
+import { useMessageContext } from "contexts/message.context";
+import type { Message } from "services/message.service";
+import { formatDate } from "utils/helpers";
 
 import styles from "styles/components/chat.module.scss";
 
@@ -19,23 +19,23 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 	const [messageText, setMessageText] = useState("");
 
 	const authContext = useAuthContext();
-	const conversationsContext = useConversationsContext();
-	const messagesContext = useMessagesContext();
+	const conversationContext = useConversationContext();
+	const messageContext = useMessageContext();
 
 	useEffect(() => {
 		messagesContainerRef.current.scrollTo(0, messagesContainerRef.current.scrollHeight);
-	}, [messagesContext.messages]);
+	}, [messageContext.messages]);
 
 	const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
 		try {
 			const messageData: Omit<Message, "_id" | "createdAt"> = {
-				conversation: conversationsContext.conversation._id,
+				conversation: conversationContext.conversation._id,
 				sender: authContext.user.username,
 				text: messageText
 			};
-			messagesContext.sendMessage(messageData);
+			messageContext.sendMessage(messageData);
 			setMessageText("");
 		} catch (error: any) {
 			alert(error.response.data.message);
@@ -46,8 +46,8 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 		<div className={styles["chat"]}>
 			<div className={styles["top_section"]}>
 				<div className={styles["column"]}>
-					<div className={styles["avatar"]}>{conversationsContext.conversation.name[0]}</div>
-					<h3>{conversationsContext.conversation.name}</h3>
+					<div className={styles["avatar"]}>{conversationContext.conversation.name[0]}</div>
+					<h3>{conversationContext.conversation.name}</h3>
 				</div>
 
 				<div className={styles["column"]}>
@@ -66,7 +66,7 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 			>
 				<div className={styles["toast"]}>Each message is automatically deleted after 24 hours.</div>
 
-				{messagesContext.messages.map((message, index) => (
+				{messageContext.messages.map((message, index) => (
 					<div
 						className={
 							message.sender === authContext.user.username ? styles["right"] : styles["left"]
@@ -75,8 +75,8 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 					>
 						<div
 							className={`${styles["wrapper"]} ${
-								index < messagesContext.messages.length - 1 &&
-								message.sender === messagesContext.messages[index + 1]?.sender
+								index < messageContext.messages.length - 1 &&
+								message.sender === messageContext.messages[index + 1]?.sender
 									? styles["current_sender"]
 									: ""
 							}`}
@@ -96,7 +96,7 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 									<div className={styles["username"]}>
 										{message.sender === authContext.user.username ? "You" : message.sender}
 									</div>
-									<div className={styles["date"]}>{dayjs(message.createdAt).format("hh:mm A")}</div>
+									<div className={styles["date"]}>{formatDate(message.createdAt)}</div>
 								</div>
 							</div>
 						</div>

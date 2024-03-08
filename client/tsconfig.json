@@ -20,9 +20,13 @@
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true,
 
-    "baseUrl": "src",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "allowArbitraryExtensions": false,
+    "allowUmdGlobalAccess": false,
+    "allowImportingTsExtensions": false,
+    "baseUrl": "./src",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noResolve": false,
     "paths": {
       "components/*": ["components/*"],
       "contexts/*": ["contexts/*"],
@@ -32,30 +36,60 @@
       "utils/*": ["utils/*"]
     },
     "resolveJsonModule": true,
-    "rootDir": "src",
-    "typeRoots": ["src/types", "node_modules/@types"],
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+    "rootDir": "./src",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
 
-    "declaration": true,
-    "noEmit": true,
+    "declaration": false,
+    "downlevelIteration": false,
+    "emitBOM": false,
+    "emitDeclarationOnly": false,
+    "importHelpers": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "newLine": "lf",
+    "noEmit": false,
+    "noEmitHelpers": false,
+    "noEmitOnError": false,
+    "outDir": "./build",
+    "preserveConstEnums": true,
     "removeComments": true,
-    "sourceMap": true,
+    "sourceMap": false,
+    "stripInternal": false,
 
     "allowJs": true,
     "checkJs": true,
     "maxNodeModuleJsDepth": 0,
 
+    "disableSizeLimit": false,
+    "plugins": [],
+
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
+    "preserveSymlinks": true,
+    "verbatimModuleSyntax": false,
+
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "suppressExcessPropertyErrors": false,
+    "suppressImplicitAnyIndexErrors": false,
 
     "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "target": "ES5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "moduleDetection": "auto",
+    "noLib": false,
+    "target": "esnext",
+    "useDefineForClassFields": true,
+
+    "noErrorTruncation": true,
+    "preserveWatchOutput": true,
+    "pretty": true,
 
     "skipLibCheck": false
   },
-  "exclude": ["build", "node_modules"],
-  "include": ["src"]
+  "exclude": ["./build", "./node_modules"],
+  "include": ["./src"]
 }

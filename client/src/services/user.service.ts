@@ -6,7 +6,7 @@ export interface User {
 	username: string;
 }
 
-class UsersService {
+class UserService {
 	getUser(accessToken: string) {
 		return axios.get<User>("/users/user", {
 			headers: {
@@ -24,4 +24,4 @@ class UsersService {
 	}
 }
 
-export const usersService = new UsersService();
+export const userService = new UserService();

@@ -8,7 +8,7 @@ export interface Message {
 	text: string;
 }
 
-class MessagesService {
+class MessageService {
 	sendMessage(accessToken: string, message: Omit<Message, "_id" | "createdAt">) {
 		return axios.post<{ _id: string; createdAt: string }>("/messages/message", message, {
 			headers: {
@@ -26,4 +26,4 @@ class MessagesService {
 	}
 }
 
-export const messagesService = new MessagesService();
+export const messageService = new MessageService();

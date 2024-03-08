@@ -1,6 +1,6 @@
-import { useConversationsContext } from "contexts/conversations.context";
-import { useMessagesContext } from "contexts/messages.context";
-import type { Conversation } from "services/conversations.service";
+import { useConversationContext } from "contexts/conversation.context";
+import { useMessageContext } from "contexts/message.context";
+import type { Conversation } from "services/conversation.service";
 
 import styles from "styles/components/menu.module.scss";
 
@@ -10,12 +10,12 @@ interface Props {
 }
 
 const Menu: React.FC<Props> = ({ isMenuOpen, setIsMenuOpen }) => {
-	const conversationsContext = useConversationsContext();
-	const messagesContext = useMessagesContext();
+	const conversationContext = useConversationContext();
+	const messageContext = useMessageContext();
 
 	const endConversation = () => {
-		conversationsContext.setConversation({} as Conversation);
-		messagesContext.setMessages([]);
+		conversationContext.setConversation({} as Conversation);
+		messageContext.setMessages([]);
 		setIsMenuOpen(false);
 	};
 

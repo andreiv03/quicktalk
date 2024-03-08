@@ -6,9 +6,13 @@ export interface AuthData {
 	username: string;
 }
 
+interface AuthResponse {
+	accessToken: string;
+}
+
 class AuthService {
 	login(authData: AuthData) {
-		return axios.post<{ accessToken: string }>("/auth/login", authData);
+		return axios.post<AuthResponse>("/auth/login", authData);
 	}
 
 	logout() {
@@ -16,11 +20,11 @@ class AuthService {
 	}
 
 	refreshToken() {
-		return axios.get<{ accessToken: string }>("/auth/refresh-token");
+		return axios.get<AuthResponse>("/auth/refresh-token");
 	}
 
 	register(authData: AuthData) {
-		return axios.post<{ accessToken: string }>("/auth/register", authData);
+		return axios.post<AuthResponse>("/auth/register", authData);
 	}
 }
 

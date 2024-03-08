@@ -5,7 +5,7 @@ export interface Conversation {
 	name: string;
 }
 
-class ConversationsService {
+class ConversationService {
 	getConversation(
 		accessToken: string,
 		receiverId: string,
@@ -31,4 +31,4 @@ class ConversationsService {
 	}
 }
 
-export const conversationsService = new ConversationsService();
+export const conversationService = new ConversationService();
