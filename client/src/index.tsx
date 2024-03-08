@@ -1,5 +1,6 @@
 import { lazy, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import { AuthContext, AuthContextProvider } from "contexts/auth.context";
 import { ConversationContextProvider } from "contexts/conversation.context";
@@ -14,16 +15,19 @@ const Register = lazy(() => import("pages/register"));
 const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(
 	<StrictMode>
-		<AuthContextProvider>
-			<ConversationContextProvider>
-				<MessageContextProvider>
-					<AuthContext.Consumer>
-						{({ accessToken, type }) => (
-							<>{accessToken ? <App /> : <>{type === "LOGIN" ? <Login /> : <Register />}</>}</>
-						)}
-					</AuthContext.Consumer>
-				</MessageContextProvider>
-			</ConversationContextProvider>
-		</AuthContextProvider>
+		<>
+			<SpeedInsights />
+			<AuthContextProvider>
+				<ConversationContextProvider>
+					<MessageContextProvider>
+						<AuthContext.Consumer>
+							{({ accessToken, type }) => (
+								<>{accessToken ? <App /> : <>{type === "LOGIN" ? <Login /> : <Register />}</>}</>
+							)}
+						</AuthContext.Consumer>
+					</MessageContextProvider>
+				</ConversationContextProvider>
+			</AuthContextProvider>
+		</>
 	</StrictMode>
 );
