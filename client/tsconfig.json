@@ -15,81 +15,96 @@
     "noUnusedParameters": true,
     "strict": true,
     "strictBindCallApply": true,
+    "strictBuiltinIteratorReturn": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true,
-
     "allowArbitraryExtensions": false,
-    "allowUmdGlobalAccess": false,
     "allowImportingTsExtensions": false,
-    "baseUrl": "./src",
+    "allowUmdGlobalAccess": false,
+    "baseUrl": "src",
     "module": "esnext",
     "moduleResolution": "bundler",
     "noResolve": false,
+    "noUncheckedSideEffectImports": true,
     "paths": {
-      "components/*": ["components/*"],
-      "contexts/*": ["contexts/*"],
-      "pages/*": ["pages/*"],
-      "services/*": ["services/*"],
-      "styles/*": ["styles/*"],
-      "utils/*": ["utils/*"]
+      "@/*": [
+        "./*"
+      ]
     },
     "resolveJsonModule": true,
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
-    "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types", "./src/types"],
-
+    "rewriteRelativeImportExtensions": true,
+    "rootDir": "./",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [],
     "declaration": false,
-    "downlevelIteration": false,
+    "declarationMap": false,
+    "downlevelIteration": true,
     "emitBOM": false,
     "emitDeclarationOnly": false,
     "importHelpers": true,
     "inlineSourceMap": false,
     "inlineSources": false,
     "newLine": "lf",
-    "noEmit": false,
-    "noEmitHelpers": false,
-    "noEmitOnError": false,
-    "outDir": "./build",
+    "noEmit": true,
+    "noEmitHelpers": true,
+    "noEmitOnError": true,
     "preserveConstEnums": true,
     "removeComments": true,
     "sourceMap": false,
     "stripInternal": false,
-
-    "allowJs": true,
-    "checkJs": true,
+    "allowJs": false,
+    "checkJs": false,
     "maxNodeModuleJsDepth": 0,
-
     "disableSizeLimit": false,
-    "plugins": [],
-
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedDeclarations": false,
     "isolatedModules": true,
-    "preserveSymlinks": true,
-    "verbatimModuleSyntax": false,
-
+    "preserveSymlinks": false,
+    "verbatimModuleSyntax": true,
     "noImplicitUseStrict": false,
     "noStrictGenericChecks": false,
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
-
-    "jsx": "react-jsx",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleDetection": "auto",
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "moduleDetection": "force",
     "noLib": false,
     "target": "esnext",
     "useDefineForClassFields": true,
-
+    "composite": false,
+    "incremental": false,
+    "tsBuildInfoFile": "node_modules/.tsbuildinfo",
     "noErrorTruncation": true,
     "preserveWatchOutput": true,
     "pretty": true,
-
-    "skipLibCheck": false
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
   },
-  "exclude": ["./build", "./node_modules"],
-  "include": ["./src"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ]
 }

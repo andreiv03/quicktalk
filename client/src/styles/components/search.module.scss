@@ -10,7 +10,7 @@
 	background: var(--background-two);
 	opacity: 0;
 	visibility: hidden;
-	transition: 100ms ease-in;
+	transition: 100ms ease;
 
 	&.open {
 		opacity: 1;
@@ -50,6 +50,18 @@
 		}
 	}
 
+	.loading {
+		max-height: 150px;
+		margin-top: 1rem;
+		padding: 0.5rem;
+		border-radius: 0.25rem;
+		background: var(--background-three);
+		font-size: 0.8rem;
+		font-weight: 500;
+		text-align: center;
+		text-transform: uppercase;
+	}
+
 	.users {
 		max-height: 150px;
 		margin-top: 1rem;
@@ -68,7 +80,7 @@
 			background: var(--background-three);
 			font-size: 0.8rem;
 			cursor: pointer;
-			transition: 100ms ease-in;
+			transition: 100ms ease;
 
 			&:hover {
 				background: var(--background-one);
@@ -105,7 +117,7 @@
 		font-size: 0.9rem;
 		font-weight: 500;
 		cursor: pointer;
-		transition: 100ms ease-in;
+		transition: 100ms ease;
 
 		&:hover {
 			background: var(--dark-accent);
@@ -123,7 +135,7 @@
 	background: var(--background-one);
 	opacity: 0;
 	visibility: hidden;
-	transition: 100ms ease-in;
+	transition: 100ms ease;
 
 	&.open {
 		opacity: 0.5;

@@ -1,12 +1,12 @@
 import { Router } from "express";
 
-import { userController } from "api/controllers/users/user.controller";
-import { usersController } from "api/controllers/users/index";
-import { authorization } from "api/middleware/authorization";
+import { UserController } from "@/controllers/user.controller";
+import { authorization } from "@/middleware/authorization";
 
 const router = Router();
 
-router.get("/user", authorization, userController);
-router.get("/username/:username", authorization, usersController);
+router.use(authorization);
+router.get("/user", UserController.getUserById);
+router.get("/search/:username", UserController.searchUsersByUsername);
 
-export { router as usersRouter };
+export default router;

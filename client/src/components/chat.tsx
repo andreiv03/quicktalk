@@ -2,81 +2,79 @@ import { useEffect, useRef, useState } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { RiSendPlaneFill } from "react-icons/ri";
 
-import { useAuthContext } from "contexts/auth.context";
-import { useConversationContext } from "contexts/conversation.context";
-import { useMessageContext } from "contexts/message.context";
-import type { Message } from "services/message.service";
-import { formatDate } from "utils/helpers";
+import { AuthContext } from "@/contexts/auth-context";
+import { ConversationsContext } from "@/contexts/conversations-context";
+import { MessagesContext } from "@/contexts/message-context";
+import { useContextHook } from "@/hooks/use-context-hook";
+import type { Message } from "@/types/message";
+import { formatTime12Hour } from "@/utils/helpers";
 
-import styles from "styles/components/chat.module.scss";
+import styles from "@/styles/components/chat.module.scss";
 
 interface Props {
 	setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
+export default function Chat({ setIsMenuOpen }: Props) {
+	const { state: authState } = useContextHook(AuthContext);
+	const { state: conversationsState } = useContextHook(ConversationsContext);
+	const { state: messagesState, sendMessage } = useContextHook(MessagesContext);
+
 	const messagesContainerRef = useRef({} as HTMLDivElement);
 	const [messageText, setMessageText] = useState("");
 
-	const authContext = useAuthContext();
-	const conversationContext = useConversationContext();
-	const messageContext = useMessageContext();
-
 	useEffect(() => {
 		messagesContainerRef.current.scrollTo(0, messagesContainerRef.current.scrollHeight);
-	}, [messageContext.messages]);
+	}, [messagesState.messages]);
 
-	const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
+	const getConversationName = () => {
+		if (!authState.user || !conversationsState.activeConversation) {
+			return "";
+		}
+
+		const participant = conversationsState.activeConversation.participants.find(
+			(participant) => participant._id !== authState.user?._id,
+		);
+
+		return participant?.username ?? "";
+	};
+
+	const handleSendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		try {
-			const messageData: Omit<Message, "_id" | "createdAt"> = {
-				conversation: conversationContext.conversation._id,
-				sender: authContext.user.username,
-				text: messageText
-			};
-			messageContext.sendMessage(messageData);
-			setMessageText("");
-		} catch (error: any) {
-			alert(error.response.data.message);
-		}
+		sendMessage(messageText);
+		setMessageText("");
 	};
 
 	return (
 		<div className={styles["chat"]}>
 			<div className={styles["top_section"]}>
 				<div className={styles["column"]}>
-					<div className={styles["avatar"]}>{conversationContext.conversation.name[0]}</div>
-					<h3>{conversationContext.conversation.name}</h3>
+					<div className={styles["avatar"]}>{getConversationName()[0]}</div>
+					<h3>{getConversationName()}</h3>
 				</div>
 
 				<div className={styles["column"]}>
-					<div
-						className={styles["button"]}
-						onClick={() => setIsMenuOpen(true)}
-					>
+					<div className={styles["button"]} onClick={() => setIsMenuOpen(true)}>
 						<HiOutlineDotsVertical />
 					</div>
 				</div>
 			</div>
 
-			<div
-				className={styles["messages"]}
-				ref={messagesContainerRef}
-			>
+			<div className={styles["messages"]} ref={messagesContainerRef}>
 				<div className={styles["toast"]}>Each message is automatically deleted after 24 hours.</div>
 
-				{messageContext.messages.map((message, index) => (
+				{messagesState.messages.map((message: Message, index: number) => (
 					<div
 						className={
-							message.sender === authContext.user.username ? styles["right"] : styles["left"]
+							message.sender === authState.user?.username ? styles["right"] : styles["left"]
 						}
 						key={message._id}
 					>
 						<div
 							className={`${styles["wrapper"]} ${
-								index < messageContext.messages.length - 1 &&
-								message.sender === messageContext.messages[index + 1]?.sender
+								index < messagesState.messages.length - 1 &&
+								message.sender === messagesState.messages[index + 1]?.sender
 									? styles["current_sender"]
 									: ""
 							}`}
@@ -86,7 +84,7 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 							<div className={styles["sender"]}>
 								<div
 									className={`${styles["avatar"]} ${
-										message.sender !== authContext.user.username ? styles["visible"] : ""
+										message.sender !== authState.user?.username ? styles["visible"] : ""
 									}`}
 								>
 									{message.sender[0]}
@@ -94,9 +92,9 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 
 								<div className={styles["informations"]}>
 									<div className={styles["username"]}>
-										{message.sender === authContext.user.username ? "You" : message.sender}
+										{message.sender === authState.user?.username ? "You" : message.sender}
 									</div>
-									<div className={styles["date"]}>{formatDate(message.createdAt)}</div>
+									<div className={styles["date"]}>{formatTime12Hour(message.createdAt)}</div>
 								</div>
 							</div>
 						</div>
@@ -107,8 +105,8 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 			<div className={styles["bottom_section"]}>
 				<form
 					noValidate
-					onKeyDown={(event) => event.key === "Enter" && sendMessage(event)}
-					onSubmit={sendMessage}
+					onKeyDown={(event) => event.key === "Enter" && handleSendMessage(event)}
+					onSubmit={handleSendMessage}
 				>
 					<input
 						autoComplete="off"
@@ -120,10 +118,7 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 						value={messageText}
 					/>
 
-					<button
-						disabled={!messageText}
-						type="submit"
-					>
+					<button disabled={!messageText} type="submit">
 						<RiSendPlaneFill />
 						<span>Send</span>
 					</button>
@@ -131,6 +126,4 @@ const Chat: React.FC<Props> = ({ setIsMenuOpen }) => {
 			</div>
 		</div>
 	);
-};
-
-export default Chat;
+}

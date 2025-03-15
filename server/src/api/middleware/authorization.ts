@@ -1,27 +1,33 @@
-import type { NextFunction, Request, Response } from "express";
+import asyncHandler from "express-async-handler";
 
-import { User } from "api/models/user";
-import { verifyToken } from "utils/jwt";
+import { User } from "@/models/user.model";
+import { verifyToken } from "@/utils/jwt";
 
-const extractBearerToken = (authorization: string | undefined) => {
-	if (!authorization) return null;
-	const parts = authorization.split(" ");
-	if (parts.length !== 2 || parts[0] !== "Bearer") return null;
-	return parts[1];
+const extractBearerToken = (authorization: string): string | null => {
+	return authorization.startsWith("Bearer ") ? (authorization.split(" ")[1] ?? null) : null;
 };
 
-export const authorization = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const authorizationToken = extractBearerToken(req.headers.authorization);
-		if (!authorizationToken) return res.status(401).json({ message: "Unauthorized" });
-
-		const payload = await verifyToken(authorizationToken);
-		const user = await User.findById(payload.sub).select("_id").lean();
-		if (!user) return res.status(404).json({ message: "User not found" });
-
-		req.userId = user._id.toString();
-		return next();
-	} catch (error: any) {
-		return res.status(500).json({ message: error.message });
+export const authorization = asyncHandler(async (req, _res, next) => {
+	const { authorization: authHeader } = req.headers;
+	if (!authHeader) {
+		throw { message: "Authorization header is missing", status: 401 };
 	}
-};
+
+	const token = extractBearerToken(authHeader);
+	if (!token) {
+		throw { message: "Bearer token is missing", status: 401 };
+	}
+
+	const decodedToken = await verifyToken(token);
+	if (!decodedToken || !decodedToken.sub) {
+		throw { message: "Invalid token", status: 401 };
+	}
+
+	const user = await User.findById(decodedToken.sub).select("_id").lean();
+	if (!user) {
+		throw { message: "User not found", status: 404 };
+	}
+
+	req.userId = user._id.toString();
+	next();
+});

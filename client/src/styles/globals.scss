@@ -46,9 +46,14 @@ button {
 
 input,
 button {
-	background: none;
 	border: none;
 	outline: none;
+	background: none;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
 }
 
 body {
@@ -64,11 +69,3 @@ body {
 	background: var(--accent);
 	color: var(--foreground-one);
 }
-
-#root {
-	width: 100vw;
-	height: 100vh;
-}
-
-// Poppins
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");

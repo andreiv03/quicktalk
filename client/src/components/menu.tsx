@@ -1,48 +1,42 @@
-import { useConversationContext } from "contexts/conversation.context";
-import { useMessageContext } from "contexts/message.context";
-import type { Conversation } from "services/conversation.service";
+import { useCallback } from "react";
 
-import styles from "styles/components/menu.module.scss";
+import { ConversationsContext } from "@/contexts/conversations-context";
+import { MessagesContext } from "@/contexts/message-context";
+import { useContextHook } from "@/hooks/use-context-hook";
+
+import styles from "@/styles/components/menu.module.scss";
 
 interface Props {
 	isMenuOpen: boolean;
 	setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Menu: React.FC<Props> = ({ isMenuOpen, setIsMenuOpen }) => {
-	const conversationContext = useConversationContext();
-	const messageContext = useMessageContext();
+export default function Menu({ isMenuOpen, setIsMenuOpen }: Props) {
+	const { leaveConversation } = useContextHook(ConversationsContext);
+	const { clearMessages } = useContextHook(MessagesContext);
 
-	const endConversation = () => {
-		conversationContext.setConversation({} as Conversation);
-		messageContext.setMessages([]);
+	const closeConversation = useCallback(() => {
+		leaveConversation();
+		clearMessages();
 		setIsMenuOpen(false);
-	};
+	}, [leaveConversation, clearMessages, setIsMenuOpen]);
 
 	return (
 		<>
-			<div className={`${styles["menu"]} ${isMenuOpen ? styles["open"] : ""}`}>
-				<button
-					onClick={endConversation}
-					type="button"
-				>
+			<div className={`${styles["menu"]} ${styles[isMenuOpen ? "open" : ""]}`}>
+				<button onClick={closeConversation} type="button">
 					End conversation
 				</button>
 
-				<button
-					onClick={() => setIsMenuOpen(false)}
-					type="button"
-				>
+				<button onClick={() => setIsMenuOpen(false)} type="button">
 					Close
 				</button>
 			</div>
 
 			<div
-				className={`${styles["overlay"]} ${isMenuOpen ? styles["open"] : ""}`}
+				className={`${styles["overlay"]} ${styles[isMenuOpen ? "open" : ""]}`}
 				onClick={() => setIsMenuOpen(false)}
 			/>
 		</>
 	);
-};
-
-export default Menu;
+}

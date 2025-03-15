@@ -1,65 +1,71 @@
-import { startTransition, useState } from "react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 import { RiArrowRightSLine, RiLogoutCircleLine, RiSearchLine } from "react-icons/ri";
 
-import { useAuthContext } from "contexts/auth.context";
-import { useConversationContext } from "contexts/conversation.context";
-import { truncateText } from "utils/helpers";
+import { truncateString } from "@/utils/helpers";
 
-import styles from "styles/components/sidebar.module.scss";
+import styles from "@/styles/components/sidebar.module.scss";
+import { useContextHook } from "@/hooks/use-context-hook";
+import { AuthContext } from "@/contexts/auth-context";
+import { ConversationsContext } from "@/contexts/conversations-context";
 
 interface Props {
 	setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Sidebar: React.FC<Props> = ({ setIsSearchOpen }) => {
+export default function Sidebar({ setIsSearchOpen }: Props) {
+	const { state: authState, logout } = useContextHook(AuthContext);
+	const { state: conversationsState, joinConversation } = useContextHook(ConversationsContext);
+
 	const [isVisible, setIsVisible] = useState(false);
 
-	const authContext = useAuthContext();
-	const conversationContext = useConversationContext();
+	const conversations = useMemo(
+		() => conversationsState.conversations ?? [],
+		[conversationsState.conversations],
+	);
 
 	return (
 		<div className={`${styles["sidebar"]} ${isVisible ? styles["visible"] : ""}`}>
 			<div className={styles["top_section"]}>
 				<div className={styles["logo"]}>
-					<img
-						alt="logo"
-						src="/logo.svg"
-					/>
+					<Image alt="logo" src="/logo.svg" priority height={40} width={40} />
 				</div>
 			</div>
 
 			<div className={styles["content"]}>
-				<div
-					className={styles["search"]}
-					onClick={() => setIsSearchOpen(true)}
-				>
+				<div className={styles["search"]} onClick={() => setIsSearchOpen(true)}>
 					<RiSearchLine />
 					<span>Find or start a conversation</span>
 				</div>
 
 				<div className={styles["conversations"]}>
 					<div className={styles["title"]}>
-						<h3>Conversations [{conversationContext.conversations.length}]</h3>
+						<h3>Conversations [{conversations.length}]</h3>
 					</div>
 
-					{conversationContext.conversations.length > 0 ? (
+					{conversations.length > 0 ? (
 						<div className={styles["container"]}>
-							{conversationContext.conversations.map((conversation) => (
-								<div
-									className={`${styles["conversation"]} ${
-										conversationContext.conversation._id === conversation._id
-											? styles["active"]
-											: ""
-									}`}
-									key={conversation._id}
-									onClick={() =>
-										startTransition(() => conversationContext.joinConversation(conversation))
-									}
-								>
-									<div className={styles["avatar"]}>{conversation.name[0]}</div>
-									<h3>{truncateText(conversation.name, 15)}</h3>
-								</div>
-							))}
+							{conversations.map((conversation) => {
+								const isActive = conversationsState.activeConversation?._id === conversation._id;
+								const participant = conversation.participants.find(
+									(participant) => participant._id !== authState.user?._id,
+								);
+
+								if (!participant) {
+									return null;
+								}
+
+								return (
+									<div
+										className={`${styles["conversation"]} ${styles[isActive ? "active" : ""]}`}
+										key={conversation._id}
+										onClick={() => joinConversation(conversation)}
+									>
+										<div className={styles["avatar"]}>{participant.username.charAt(0)}</div>
+										<h3>{truncateString(participant.username, 15)}</h3>
+									</div>
+								);
+							})}
 						</div>
 					) : (
 						<div className={styles["subtitle"]}>
@@ -70,23 +76,15 @@ const Sidebar: React.FC<Props> = ({ setIsSearchOpen }) => {
 			</div>
 
 			<div className={styles["bottom_section"]}>
-				<button
-					onClick={authContext.logout}
-					type="button"
-				>
+				<button onClick={logout} type="button">
 					<RiLogoutCircleLine />
 					<span>Log out</span>
 				</button>
 			</div>
 
-			<div
-				className={styles["close"]}
-				onClick={() => setIsVisible(!isVisible)}
-			>
+			<div className={styles["close"]} onClick={() => setIsVisible(!isVisible)}>
 				<RiArrowRightSLine />
 			</div>
 		</div>
 	);
-};
-
-export default Sidebar;
+}

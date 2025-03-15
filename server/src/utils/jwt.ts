@@ -1,26 +1,34 @@
 import jwt from "jsonwebtoken";
+import type { StringValue } from "ms";
 
-import { config } from "utils/config";
+import { ENV } from "@/config/constants";
 
-export const signToken = (subject: any, expiresIn: string): Promise<string> => {
+export const signToken = (
+	subject: string | object,
+	expiresIn: number | StringValue,
+): Promise<string> => {
 	return new Promise((resolve, reject) => {
-		const payload = { sub: subject };
-		const options = { expiresIn };
+		const payload: string | Buffer | object = { sub: subject };
+		const options: jwt.SignOptions = { algorithm: "HS256", expiresIn };
 
-		jwt.sign(payload, config.JWT_SECRET, options, (error, token) => {
-			if (error) return reject(error);
-			if (!token) return reject("Token generation failed");
+		jwt.sign(payload, ENV.JWT_SECRET, options, (error, token) => {
+			if (error || !token) {
+				return reject(error || "Token generation failed");
+			}
+
 			resolve(token);
 		});
 	});
 };
 
-export const verifyToken = (token: string): Promise<jwt.JwtPayload> => {
+export const verifyToken = (token: string): Promise<string | jwt.JwtPayload> => {
 	return new Promise((resolve, reject) => {
-		jwt.verify(token, config.JWT_SECRET, (error, decoded) => {
-			if (error) return reject(error);
-			if (!decoded) return reject("Token verification failed");
-			resolve(decoded as jwt.JwtPayload);
+		jwt.verify(token, ENV.JWT_SECRET, (error, decoded) => {
+			if (error || !decoded) {
+				return reject(error || "Token verification failed");
+			}
+
+			resolve(decoded);
 		});
 	});
 };

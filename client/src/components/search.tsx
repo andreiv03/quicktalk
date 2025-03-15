@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useAuthContext } from "contexts/auth.context";
-import { useConversationContext } from "contexts/conversation.context";
-import { conversationService } from "services/conversation.service";
-import { userService, type User } from "services/user.service";
+import axios from "@/config/axios";
+import { AuthContext } from "@/contexts/auth-context";
+import { ConversationsContext } from "@/contexts/conversations-context";
+import { useContextHook } from "@/hooks/use-context-hook";
+import type { GetConversationResponse } from "@/types/conversation";
+import type { GetUsersResponse, User } from "@/types/user";
 
-import styles from "styles/components/search.module.scss";
+import styles from "@/styles/components/search.module.scss";
+import { truncateString } from "@/utils/helpers";
+import { asyncHandler } from "@/utils/async-handler";
 
 interface Props {
 	isSearchOpen: boolean;
@@ -13,91 +17,109 @@ interface Props {
 }
 
 const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
-	const [username, setUsername] = useState("");
-	const [users, setUsers] = useState<User[]>([]);
+	const { state: authState } = useContextHook(AuthContext);
+	const { joinConversation } = useContextHook(ConversationsContext);
 
-	const authContext = useAuthContext();
-	const conversationContext = useConversationContext();
+	const searchRef = useRef<HTMLInputElement>(null);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [users, setUsers] = useState<User[]>([]);
+	const [loading, setLoading] = useState(false);
+
+	const fetchUsers = useCallback(
+		async (searchQuery: string) => {
+			try {
+				await asyncHandler(async () => {
+					if (searchQuery.trim()) {
+						setLoading(true);
+
+						const { data } = await axios.get<GetUsersResponse>(`/users/search/${searchQuery}`, {
+							headers: { Authorization: `Bearer ${authState.accessToken}` },
+						});
+
+						setUsers(data.users);
+						setLoading(false);
+					}
+				}, true)();
+			} catch {
+				setLoading(false);
+			}
+		},
+		[authState.accessToken],
+	);
 
 	useEffect(() => {
-		if (!username) return setUsers([]);
-
-		const getUsersByUsername = async () => {
-			try {
-				const { data } = await userService.getUsersByUsername(authContext.accessToken, username);
-				setUsers(data);
-			} catch (error: any) {
-				alert(error.response.data.message);
+		const delaySearch = setTimeout(() => {
+			if (searchQuery.trim()) {
+				fetchUsers(searchQuery);
 			}
-		};
+		}, 300);
 
-		getUsersByUsername();
-	}, [username]);
+		return () => clearTimeout(delaySearch);
+	}, [searchQuery, fetchUsers]);
 
-	const closeSearch = () => {
+	const closeSearch = useCallback(() => {
 		setIsSearchOpen(false);
-		setUsername("");
+		setSearchQuery("");
 		setUsers([]);
-	};
+	}, [setIsSearchOpen]);
 
-	const openConversation = async (receiverId: string, receiverUsername: string) => {
-		try {
-			const { data } = await conversationService.getConversation(
-				authContext.accessToken,
-				receiverId,
-				receiverUsername,
-				authContext.user.username
-			);
-			conversationContext.setConversation(data);
-			conversationContext.setCallback(!conversationContext.callback);
-			closeSearch();
-		} catch (error: any) {
-			alert(error.response.data.message);
-		}
-	};
+	const openConversation = useCallback(
+		(receiverId: string) => {
+			return asyncHandler(async () => {
+				const API_ROUTE = `/conversations/conversation/${receiverId}`;
+				const { data } = await axios.get<GetConversationResponse>(API_ROUTE, {
+					headers: { Authorization: `Bearer ${authState.accessToken}` },
+				});
+
+				joinConversation(data.conversation);
+				closeSearch();
+			})();
+		},
+		[authState.accessToken, joinConversation, closeSearch],
+	);
 
 	return (
 		<>
-			<div className={`${styles["search"]} ${isSearchOpen ? styles["open"] : ""}`}>
-				<form onSubmit={() => {}}>
-					<label htmlFor="username">Find or start a conversation</label>
+			<div className={`${styles["search"]} ${styles[isSearchOpen ? "open" : ""]}`}>
+				<form>
+					<label htmlFor="search">Find or start a conversation</label>
 					<div className={styles["input_container"]}>
 						<input
 							autoComplete="off"
-							id="username"
-							onChange={(event) => setUsername(event.target.value)}
+							autoFocus
+							id="search"
+							onChange={(event) => setSearchQuery(event.target.value)}
 							placeholder="username"
+							ref={searchRef}
 							type="text"
-							value={username}
+							value={searchQuery}
 						/>
 					</div>
 				</form>
 
-				{users.length > 0 ? (
+				{loading && <div className={styles["loading"]}>Searching...</div>}
+
+				{!loading && users.length > 0 ? (
 					<div className={styles["users"]}>
 						{users.map((user) => (
 							<div
 								className={styles["user"]}
 								key={user._id}
+								onClick={() => openConversation(user._id)}
 							>
-								<span onClick={() => openConversation(user._id, user.username)}>
-									{user.username}
-								</span>
+								<span>{truncateString(user.username, 20)}</span>
 							</div>
 						))}
 					</div>
 				) : null}
 
-				<button
-					onClick={closeSearch}
-					type="button"
-				>
+				<button onClick={closeSearch} type="button">
 					Close
 				</button>
 			</div>
 
 			<div
-				className={`${styles["overlay"]} ${isSearchOpen ? styles["open"] : ""}`}
+				className={`${styles["overlay"]} ${styles[isSearchOpen ? "open" : ""]}`}
 				onClick={closeSearch}
 			/>
 		</>
