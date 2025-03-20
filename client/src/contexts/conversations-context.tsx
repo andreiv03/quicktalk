@@ -17,8 +17,8 @@ interface ConversationsState {
 type ConversationsAction =
 	| { type: "SET_CONVERSATIONS"; payload: Conversation[] }
 	| { type: "ADD_CONVERSATION"; payload: Conversation }
-	| { type: "SET_ACTIVE_CONVERSATION"; payload: Conversation }
-	| { type: "CLEAR_ACTIVE_CONVERSATION" };
+	| { type: "JOIN_CONVERSATION"; payload: Conversation }
+	| { type: "LEAVE_CONVERSATION" };
 
 interface ConversationsContext {
 	state: ConversationsState;
@@ -36,10 +36,10 @@ const reducer = (state: ConversationsState, action: ConversationsAction): Conver
 		case "ADD_CONVERSATION":
 			return { ...state, conversations: [...state.conversations, action.payload] };
 
-		case "SET_ACTIVE_CONVERSATION":
+		case "JOIN_CONVERSATION":
 			return { ...state, activeConversation: action.payload };
 
-		case "CLEAR_ACTIVE_CONVERSATION":
+		case "LEAVE_CONVERSATION":
 			return { ...state, activeConversation: null };
 
 		default:
@@ -48,34 +48,27 @@ const reducer = (state: ConversationsState, action: ConversationsAction): Conver
 };
 
 export function ConversationsProvider({ children }: { children: React.ReactNode }) {
-	const { state: authState } = useContextHook(AuthContext);
-
+	const { user } = useContextHook(AuthContext);
 	const [state, dispatch] = useReducer(reducer, { conversations: [], activeConversation: null });
 
 	const fetchConversations = useCallback(() => {
 		return asyncHandler(async () => {
-			if (authState.accessToken) {
-				const { data } = await axios.get<GetConversationsResponse>("/conversations", {
-					headers: { Authorization: `Bearer ${authState.accessToken}` },
-				});
+			if (user) {
+				const { data } = await axios.get<GetConversationsResponse>("/conversations");
 				dispatch({ type: "SET_CONVERSATIONS", payload: data.conversations });
 			}
 		})();
-	}, [authState.accessToken]);
+	}, [user]);
 
 	useEffect(() => {
-		if (authState.accessToken) {
+		if (user) {
 			fetchConversations();
 		}
-	}, [authState.accessToken, fetchConversations]);
+	}, [user, fetchConversations]);
 
 	const joinConversation = useCallback(
 		(conversation: Conversation) => {
-			if (!conversation) {
-				return;
-			}
-
-			if (state.activeConversation?._id === conversation._id) {
+			if (!conversation || state.activeConversation?._id === conversation._id) {
 				return;
 			}
 
@@ -84,12 +77,12 @@ export function ConversationsProvider({ children }: { children: React.ReactNode 
 				socket.connect();
 			}
 
-			if (state.activeConversation?._id) {
+			if (state.activeConversation) {
 				socket.emit("leave_conversation", state.activeConversation._id);
 			}
 
 			socket.emit("join_conversation", conversation._id);
-			dispatch({ type: "SET_ACTIVE_CONVERSATION", payload: conversation });
+			dispatch({ type: "JOIN_CONVERSATION", payload: conversation });
 
 			if (!state.conversations.find((c) => c._id === conversation._id)) {
 				dispatch({ type: "ADD_CONVERSATION", payload: conversation });
@@ -109,7 +102,7 @@ export function ConversationsProvider({ children }: { children: React.ReactNode 
 		}
 
 		socket.emit("leave_conversation", state.activeConversation._id);
-		dispatch({ type: "CLEAR_ACTIVE_CONVERSATION" });
+		dispatch({ type: "LEAVE_CONVERSATION" });
 	}, [state.activeConversation]);
 
 	const contextValue = useMemo(

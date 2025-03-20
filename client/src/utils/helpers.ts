@@ -16,7 +16,17 @@ export const calculatePasswordStrength = (password: string): string => {
 	result = strength > 50 ? "medium" : result;
 	result = strength > 75 ? "strong" : result;
 	result = strength > 100 ? "very strong" : result;
+
 	return result;
+};
+
+export const extractToken = (cookies: string[] | undefined, tokenName: string) => {
+	if (!cookies) {
+		return null;
+	}
+
+	const token = cookies.find((cookie) => cookie.startsWith(`${tokenName}=`));
+	return token ? token.split("=")[1]?.split(";")[0]?.trim() || null : null;
 };
 
 export const formatTime12Hour = (dateString: string): string => {

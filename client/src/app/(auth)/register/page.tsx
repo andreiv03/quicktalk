@@ -22,18 +22,6 @@ export default function Register() {
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 	const [passwordStrength, setPasswordStrength] = useState("");
 
-	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const email = event.target.value;
-		setEmail(email);
-		setIsEmailValid(validateEmail(email));
-	};
-
-	const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const password = event.target.value;
-		setPassword(password);
-		setPasswordStrength(calculatePasswordStrength(password));
-	};
-
 	const validateForm = () => {
 		return !!username && !!email && !!password && isEmailValid && passwordStrength !== "weak";
 	};
@@ -75,7 +63,7 @@ export default function Register() {
 							autoFocus
 							id="username"
 							onChange={(event) => setUsername(event.target.value)}
-							placeholder=" "
+							placeholder=""
 							type="text"
 							value={username}
 						/>
@@ -86,8 +74,12 @@ export default function Register() {
 						<input
 							autoComplete="email"
 							id="email"
-							onChange={handleEmailChange}
-							placeholder=" "
+							onChange={(event) => {
+								const email = event.target.value;
+								setEmail(email);
+								setIsEmailValid(validateEmail(email));
+							}}
+							placeholder=""
 							type="email"
 							value={email}
 						/>
@@ -105,8 +97,12 @@ export default function Register() {
 						<input
 							autoComplete="current-password"
 							id="password"
-							onChange={handlePasswordChange}
-							placeholder=" "
+							onChange={(event) => {
+								const password = event.target.value;
+								setPassword(password);
+								setPasswordStrength(calculatePasswordStrength(password));
+							}}
+							placeholder=""
 							type={isPasswordVisible ? "text" : "password"}
 							value={password}
 						/>
@@ -136,6 +132,7 @@ export default function Register() {
 				<h3>
 					Already have an account? <Link href={"/login"}>Sign in</Link>
 				</h3>
+
 				<h4>
 					By creating an account you agree to the{" "}
 					<Link href="/terms-and-conditions">Terms and Conditions</Link> and{" "}

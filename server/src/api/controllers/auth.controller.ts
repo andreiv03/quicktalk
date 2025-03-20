@@ -1,7 +1,6 @@
 import asyncHandler from "express-async-handler";
 import { AuthService } from "@/services/auth.service";
-
-const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+import { COOKIE_OPTIONS } from "@/config/constants";
 
 export const AuthController = {
 	login: asyncHandler(async (req, res) => {
@@ -11,15 +10,7 @@ export const AuthController = {
 		}
 
 		const { accessToken, refreshToken } = await AuthService.login(username, password);
-
-		res.cookie("refreshToken", refreshToken, {
-			httpOnly: true,
-			sameSite: "strict",
-			secure: process.env["NODE_ENV"] === "production",
-			path: "/",
-			maxAge: COOKIE_MAX_AGE,
-		});
-
+		res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
 		res.status(200).json({ message: "Logged in successfully", accessToken });
 	}),
 
@@ -30,26 +21,12 @@ export const AuthController = {
 		}
 
 		const { accessToken, refreshToken } = await AuthService.register(username, email, password);
-
-		res.cookie("refreshToken", refreshToken, {
-			httpOnly: true,
-			sameSite: "strict",
-			secure: process.env["NODE_ENV"] === "production",
-			path: "/",
-			maxAge: COOKIE_MAX_AGE,
-		});
-
+		res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
 		res.status(201).json({ message: "Registered successfully", accessToken });
 	}),
 
 	logout: asyncHandler(async (_req, res) => {
-		res.clearCookie("refreshToken", {
-			httpOnly: true,
-			sameSite: "strict",
-			secure: process.env["NODE_ENV"] === "production",
-			path: "/",
-		});
-
+		res.clearCookie("refreshToken", { ...COOKIE_OPTIONS, maxAge: undefined });
 		res.status(200).json({ message: "Logged out successfully" });
 	}),
 

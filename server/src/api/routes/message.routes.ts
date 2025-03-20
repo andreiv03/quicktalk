@@ -6,7 +6,7 @@ import { authorization } from "@/middleware/authorization";
 const router = Router();
 
 router.use(authorization);
-router.get("/conversation/:conversationId", MessageController.getMessagesForConversation);
+router.get("/:conversationId", MessageController.getMessagesForConversation);
 router.post("/send-message", MessageController.sendMessage);
 
 export default router;

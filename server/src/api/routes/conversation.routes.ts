@@ -7,6 +7,6 @@ const router = Router();
 
 router.use(authorization);
 router.get("/", ConversationController.getUserConversations);
-router.get("/conversation/:receiverId", ConversationController.getOrCreateConversation);
+router.get("/:receiverId", ConversationController.getOrCreateConversation);
 
 export default router;

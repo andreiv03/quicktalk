@@ -17,5 +17,15 @@ Object.entries(ENV).forEach(([key, value]) => {
 });
 
 export const AXIOS_HEADERS = {
+	Accept: "application/json",
 	"Content-Type": "application/json",
 } as const;
+
+export const COOKIE_OPTIONS = (maxAge: number) =>
+	({
+		httpOnly: true,
+		maxAge,
+		path: "/",
+		sameSite: "strict",
+		secure: process.env.NODE_ENV !== "development",
+	} as const);

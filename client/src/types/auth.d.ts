@@ -1,6 +1,6 @@
 export interface LoginFormData {
-	username: string;
 	password: string;
+	username: string;
 }
 
 export interface RegisterFormData extends LoginFormData {

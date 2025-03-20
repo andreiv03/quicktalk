@@ -1,24 +1,15 @@
 "use client";
 
-import { createContext, useCallback, useEffect, useMemo, useReducer } from "react";
+import { useRouter } from "next/navigation";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 
 import axios from "@/config/axios";
-import type { AuthResponse, LoginFormData, RegisterFormData } from "@/types/auth";
+import type { LoginFormData, RegisterFormData } from "@/types/auth";
 import type { GetUserResponse, User } from "@/types/user";
 import { asyncHandler } from "@/utils/async-handler";
 
-interface AuthState {
-	accessToken: string;
-	user: User | null;
-}
-
-type AuthAction =
-	| { type: "SET_ACCESS_TOKEN"; payload: string }
-	| { type: "SET_USER"; payload: User }
-	| { type: "LOGOUT" };
-
 interface AuthContext {
-	state: AuthState;
+	user: User | null;
 	login: (formData: LoginFormData) => Promise<void>;
 	register: (formData: RegisterFormData) => Promise<void>;
 	logout: () => Promise<void>;
@@ -26,72 +17,59 @@ interface AuthContext {
 
 export const AuthContext = createContext<AuthContext | null>(null);
 
-const reducer = (state: AuthState, action: AuthAction): AuthState => {
-	switch (action.type) {
-		case "SET_ACCESS_TOKEN":
-			return { ...state, accessToken: action.payload };
-
-		case "SET_USER":
-			return { ...state, user: action.payload };
-
-		case "LOGOUT":
-			return { ...state, accessToken: "", user: null };
-
-		default:
-			return state;
-	}
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-	const [state, dispatch] = useReducer(reducer, { accessToken: "", user: null });
-
-	const login = useCallback((authData: LoginFormData) => {
-		return asyncHandler(async () => {
-			const { data } = await axios.post<AuthResponse>("/auth/login", authData);
-			dispatch({ type: "SET_ACCESS_TOKEN", payload: data.accessToken });
-		})();
-	}, []);
-
-	const register = useCallback((authData: RegisterFormData) => {
-		return asyncHandler(async () => {
-			const { data } = await axios.post<AuthResponse>("/auth/register", authData);
-			dispatch({ type: "SET_ACCESS_TOKEN", payload: data.accessToken });
-		})();
-	}, []);
+	const router = useRouter();
+	const [user, setUser] = useState<User | null>(null);
 
 	const logout = useCallback(() => {
 		return asyncHandler(async () => {
-			await axios.post("/auth/logout");
-			dispatch({ type: "LOGOUT" });
+			await axios.post("/api/auth/logout");
+			setUser(null);
+			router.replace("/login");
 		})();
-	}, []);
+	}, [router]);
 
 	const fetchUser = useCallback(async () => {
 		try {
 			await asyncHandler(async () => {
-				if (state.accessToken) {
-					const { data } = await axios.get<GetUserResponse>("/users/user", {
-						headers: { Authorization: `Bearer ${state.accessToken}` },
-					});
-					dispatch({ type: "SET_USER", payload: data.user });
-				}
+				const { data } = await axios.get<GetUserResponse>("/users/user");
+				setUser(data.user);
 			}, true)();
 		} catch {
 			await logout();
 		}
-	}, [state.accessToken, logout]);
+	}, [logout]);
 
 	useEffect(() => {
-		if (state.accessToken) {
-			fetchUser();
-		}
-	}, [state.accessToken, fetchUser]);
+		fetchUser();
+	}, [fetchUser]);
+
+	const login = useCallback(
+		(formData: LoginFormData) => {
+			return asyncHandler(async () => {
+				await axios.post("/api/auth/login", formData);
+				await fetchUser();
+				router.replace("/");
+			})();
+		},
+		[fetchUser, router],
+	);
+
+	const register = useCallback(
+		(formData: RegisterFormData) => {
+			return asyncHandler(async () => {
+				await axios.post("/api/auth/register", formData);
+				await fetchUser();
+				router.replace("/");
+			})();
+		},
+		[fetchUser, router],
+	);
 
 	const refreshToken = useCallback(async () => {
 		try {
 			await asyncHandler(async () => {
-				const { data } = await axios.get<AuthResponse>("/auth/refresh-token");
-				dispatch({ type: "SET_ACCESS_TOKEN", payload: data.accessToken });
+				await axios.get("/api/auth/refresh-token");
 			}, true)();
 		} catch {
 			await logout();
@@ -104,12 +82,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		const interval = setInterval(refreshToken, 10 * 60 * 1000); // 10 minutes
-		return () => clearInterval(interval);
+		return () => {
+			clearInterval(interval);
+		};
 	}, [refreshToken]);
 
 	const contextValue = useMemo(
-		() => ({ state, login, register, logout }),
-		[state, login, register, logout],
+		() => ({ user, login, register, logout }),
+		[user, login, register, logout],
 	);
 
 	return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

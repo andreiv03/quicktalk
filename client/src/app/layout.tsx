@@ -5,7 +5,6 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { ConversationsProvider } from "@/contexts/conversations-context";
 import { MessagesProvider } from "@/contexts/message-context";
 
-import { RedirectHandler } from "@/app/redirect-handler";
 import "@/styles/globals.scss";
 
 const poppins = Poppins({
@@ -15,7 +14,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
 	title: "QuickTalk",
-	description: "A real-time chat application",
+	description: "Connect with friends and the world around you. It's quick and easy!",
 };
 
 export default function RootLayout({
@@ -27,11 +26,9 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={poppins.className}>
 				<AuthProvider>
-					<RedirectHandler>
-						<ConversationsProvider>
-							<MessagesProvider>{children}</MessagesProvider>
-						</ConversationsProvider>
-					</RedirectHandler>
+					<ConversationsProvider>
+						<MessagesProvider>{children}</MessagesProvider>
+					</ConversationsProvider>
 				</AuthProvider>
 			</body>
 		</html>

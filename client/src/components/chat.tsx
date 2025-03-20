@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function Chat({ setIsMenuOpen }: Props) {
-	const { state: authState } = useContextHook(AuthContext);
+	const { user } = useContextHook(AuthContext);
 	const { state: conversationsState } = useContextHook(ConversationsContext);
 	const { state: messagesState, sendMessage } = useContextHook(MessagesContext);
 
@@ -28,12 +28,12 @@ export default function Chat({ setIsMenuOpen }: Props) {
 	}, [messagesState.messages]);
 
 	const getConversationName = () => {
-		if (!authState.user || !conversationsState.activeConversation) {
+		if (!user || !conversationsState.activeConversation) {
 			return "";
 		}
 
 		const participant = conversationsState.activeConversation.participants.find(
-			(participant) => participant._id !== authState.user?._id,
+			(participant) => participant._id !== user?._id,
 		);
 
 		return participant?.username ?? "";
@@ -66,9 +66,7 @@ export default function Chat({ setIsMenuOpen }: Props) {
 
 				{messagesState.messages.map((message: Message, index: number) => (
 					<div
-						className={
-							message.sender === authState.user?.username ? styles["right"] : styles["left"]
-						}
+						className={message.sender === user?.username ? styles["right"] : styles["left"]}
 						key={message._id}
 					>
 						<div
@@ -84,7 +82,7 @@ export default function Chat({ setIsMenuOpen }: Props) {
 							<div className={styles["sender"]}>
 								<div
 									className={`${styles["avatar"]} ${
-										message.sender !== authState.user?.username ? styles["visible"] : ""
+										message.sender !== user?.username ? styles["visible"] : ""
 									}`}
 								>
 									{message.sender[0]}
@@ -92,7 +90,7 @@ export default function Chat({ setIsMenuOpen }: Props) {
 
 								<div className={styles["informations"]}>
 									<div className={styles["username"]}>
-										{message.sender === authState.user?.username ? "You" : message.sender}
+										{message.sender === user?.username ? "You" : message.sender}
 									</div>
 									<div className={styles["date"]}>{formatTime12Hour(message.createdAt)}</div>
 								</div>

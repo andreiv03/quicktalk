@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { RiArrowRightSLine, RiLogoutCircleLine, RiSearchLine } from "react-icons/ri";
+import { RiArrowRightSLine, RiSearchLine } from "react-icons/ri";
+import { CgLogOut } from "react-icons/cg";
 
 import { truncateString } from "@/utils/helpers";
 
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export default function Sidebar({ setIsSearchOpen }: Props) {
-	const { state: authState, logout } = useContextHook(AuthContext);
+	const { user, logout } = useContextHook(AuthContext);
 	const { state: conversationsState, joinConversation } = useContextHook(ConversationsContext);
 
 	const [isVisible, setIsVisible] = useState(false);
@@ -48,7 +49,7 @@ export default function Sidebar({ setIsSearchOpen }: Props) {
 							{conversations.map((conversation) => {
 								const isActive = conversationsState.activeConversation?._id === conversation._id;
 								const participant = conversation.participants.find(
-									(participant) => participant._id !== authState.user?._id,
+									(participant) => participant._id !== user?._id,
 								);
 
 								if (!participant) {
@@ -77,7 +78,7 @@ export default function Sidebar({ setIsSearchOpen }: Props) {
 
 			<div className={styles["bottom_section"]}>
 				<button onClick={logout} type="button">
-					<RiLogoutCircleLine />
+					<CgLogOut />
 					<span>Log out</span>
 				</button>
 			</div>

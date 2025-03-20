@@ -38,28 +38,26 @@ const reducer = (state: MessagesState, action: MessagesAction): MessagesState =>
 };
 
 export function MessagesProvider({ children }: { children: React.ReactNode }) {
-	const { state: authState } = useContextHook(AuthContext);
+	const { user } = useContextHook(AuthContext);
 	const { state: conversationsState } = useContextHook(ConversationsContext);
 
 	const [state, dispatch] = useReducer(reducer, { messages: [] });
 
 	const fetchMessages = useCallback(() => {
 		return asyncHandler(async () => {
-			if (authState.accessToken && conversationsState.activeConversation) {
-				const API_ROUTE = `/messages/conversation/${conversationsState.activeConversation._id}`;
-				const { data } = await axios.get<GetMessagesResponse>(API_ROUTE, {
-					headers: { Authorization: `Bearer ${authState.accessToken}` },
-				});
+			if (conversationsState.activeConversation) {
+				const conversationId = conversationsState.activeConversation._id;
+				const { data } = await axios.get<GetMessagesResponse>(`/messages/${conversationId}`);
 				dispatch({ type: "SET_MESSAGES", payload: data.messages });
 			}
 		})();
-	}, [authState.accessToken, conversationsState.activeConversation]);
+	}, [conversationsState.activeConversation]);
 
 	useEffect(() => {
-		if (authState.accessToken && conversationsState.activeConversation?._id) {
+		if (conversationsState.activeConversation) {
 			fetchMessages();
 		}
-	}, [authState.accessToken, conversationsState.activeConversation, fetchMessages]);
+	}, [conversationsState.activeConversation, fetchMessages]);
 
 	const receiveMessage = useCallback(
 		(message: Message) => {
@@ -75,7 +73,6 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		socket.off("receive_message").on("receive_message", receiveMessage);
-
 		return () => {
 			socket.off("receive_message", receiveMessage);
 		};
@@ -84,11 +81,7 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
 	const sendMessage = useCallback(
 		(text: string) => {
 			return asyncHandler(async () => {
-				if (!authState.accessToken || !authState.user) {
-					return;
-				}
-
-				if (!conversationsState.activeConversation) {
+				if (!user || !conversationsState.activeConversation) {
 					return;
 				}
 
@@ -99,19 +92,16 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
 
 				const formData = {
 					conversation: conversationsState.activeConversation._id,
-					sender: authState.user._id,
+					sender: user._id,
 					text,
 				};
 
-				const { data } = await axios.post<SendMessageResponse>("/messages/send-message", formData, {
-					headers: { Authorization: `Bearer ${authState.accessToken}` },
-				});
-
+				const { data } = await axios.post<SendMessageResponse>("/messages/send-message", formData);
 				socket.emit("send_message", data);
 				dispatch({ type: "SET_MESSAGES", payload: [...state.messages, data.newMessage] });
 			})();
 		},
-		[authState.accessToken, authState.user, conversationsState.activeConversation, state.messages],
+		[user, conversationsState.activeConversation, state.messages],
 	);
 
 	const clearMessages = useCallback(() => {

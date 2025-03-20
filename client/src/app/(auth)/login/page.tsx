@@ -53,7 +53,7 @@ export default function Login() {
 							autoFocus
 							id="username"
 							onChange={(event) => setUsername(event.target.value)}
-							placeholder=" "
+							placeholder=""
 							type="text"
 							value={username}
 						/>
@@ -65,7 +65,7 @@ export default function Login() {
 							autoComplete="current-password"
 							id="password"
 							onChange={(event) => setPassword(event.target.value)}
-							placeholder=" "
+							placeholder=""
 							type={isPasswordVisible ? "text" : "password"}
 							value={password}
 						/>

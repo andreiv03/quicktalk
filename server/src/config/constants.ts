@@ -52,3 +52,11 @@ export const HELMET_OPTIONS: HelmetOptions = {
 	referrerPolicy: { policy: "no-referrer" },
 	xssFilter: true,
 } as const;
+
+export const COOKIE_OPTIONS = {
+	httpOnly: true,
+	maxAge: 7 * 24 * 60 * 60, // 7 days
+	path: "/",
+	sameSite: "strict",
+	secure: process.env["NODE_ENV"] !== "development",
+} as const;

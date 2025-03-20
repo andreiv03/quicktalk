@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import axios from "@/config/axios";
-import { AuthContext } from "@/contexts/auth-context";
 import { ConversationsContext } from "@/contexts/conversations-context";
 import { useContextHook } from "@/hooks/use-context-hook";
 import type { GetConversationResponse } from "@/types/conversation";
@@ -17,7 +16,6 @@ interface Props {
 }
 
 const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
-	const { state: authState } = useContextHook(AuthContext);
 	const { joinConversation } = useContextHook(ConversationsContext);
 
 	const searchRef = useRef<HTMLInputElement>(null);
@@ -25,27 +23,20 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState(false);
 
-	const fetchUsers = useCallback(
-		async (searchQuery: string) => {
-			try {
-				await asyncHandler(async () => {
-					if (searchQuery.trim()) {
-						setLoading(true);
-
-						const { data } = await axios.get<GetUsersResponse>(`/users/search/${searchQuery}`, {
-							headers: { Authorization: `Bearer ${authState.accessToken}` },
-						});
-
-						setUsers(data.users);
-						setLoading(false);
-					}
-				}, true)();
-			} catch {
-				setLoading(false);
-			}
-		},
-		[authState.accessToken],
-	);
+	const fetchUsers = useCallback(async (searchQuery: string) => {
+		try {
+			await asyncHandler(async () => {
+				if (searchQuery.trim()) {
+					setLoading(true);
+					const { data } = await axios.get<GetUsersResponse>(`/users/search/${searchQuery}`);
+					setUsers(data.users);
+					setLoading(false);
+				}
+			}, true)();
+		} catch {
+			setLoading(false);
+		}
+	}, []);
 
 	useEffect(() => {
 		const delaySearch = setTimeout(() => {
@@ -66,16 +57,12 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 	const openConversation = useCallback(
 		(receiverId: string) => {
 			return asyncHandler(async () => {
-				const API_ROUTE = `/conversations/conversation/${receiverId}`;
-				const { data } = await axios.get<GetConversationResponse>(API_ROUTE, {
-					headers: { Authorization: `Bearer ${authState.accessToken}` },
-				});
-
+				const { data } = await axios.get<GetConversationResponse>(`/conversations/${receiverId}`);
 				joinConversation(data.conversation);
 				closeSearch();
 			})();
 		},
-		[authState.accessToken, joinConversation, closeSearch],
+		[joinConversation, closeSearch],
 	);
 
 	return (
