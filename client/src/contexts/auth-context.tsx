@@ -10,8 +10,8 @@ import { asyncHandler } from "@/utils/async-handler";
 
 interface AuthContext {
 	user: User | null;
-	login: (formData: LoginFormData) => Promise<void>;
-	register: (formData: RegisterFormData) => Promise<void>;
+	login: (formData: LoginFormData) => Promise<boolean>;
+	register: (formData: RegisterFormData) => Promise<boolean>;
 	logout: () => Promise<void>;
 }
 
@@ -30,6 +30,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	}, [router]);
 
 	const fetchUser = useCallback(async () => {
+		if (user) {
+			return;
+		}
+
 		try {
 			await asyncHandler(async () => {
 				const { data } = await axios.get<GetUserResponse>("/users/user");
@@ -38,35 +42,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		} catch {
 			await logout();
 		}
-	}, [logout]);
+	}, [user, logout]);
 
 	useEffect(() => {
 		fetchUser();
 	}, [fetchUser]);
 
 	const login = useCallback(
-		(formData: LoginFormData) => {
-			return asyncHandler(async () => {
-				await axios.post("/api/auth/login", formData);
-				await fetchUser();
-				router.replace("/");
-			})();
+		async (formData: LoginFormData) => {
+			if (user) {
+				return true;
+			}
+
+			try {
+				return await asyncHandler(async () => {
+					const { data } = await axios.post("/api/auth/login", formData);
+					await fetchUser();
+					router.replace("/");
+					return data.success as boolean;
+				}, true)();
+			} catch {
+				return false;
+			}
 		},
-		[fetchUser, router],
+		[user, fetchUser, router],
 	);
 
 	const register = useCallback(
-		(formData: RegisterFormData) => {
-			return asyncHandler(async () => {
-				await axios.post("/api/auth/register", formData);
-				await fetchUser();
-				router.replace("/");
-			})();
+		async (formData: RegisterFormData) => {
+			if (user) {
+				return true;
+			}
+
+			try {
+				return await asyncHandler(async () => {
+					const { data } = await axios.post("/api/auth/register", formData);
+					await fetchUser();
+					router.replace("/");
+					return data.success as boolean;
+				}, true)();
+			} catch {
+				return false;
+			}
 		},
-		[fetchUser, router],
+		[user, fetchUser, router],
 	);
 
 	const refreshToken = useCallback(async () => {
+		if (!user) {
+			return;
+		}
+
 		try {
 			await asyncHandler(async () => {
 				await axios.get("/api/auth/refresh-token");
@@ -74,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		} catch {
 			await logout();
 		}
-	}, [logout]);
+	}, [user, logout]);
 
 	useEffect(() => {
 		refreshToken();

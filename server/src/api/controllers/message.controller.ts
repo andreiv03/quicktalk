@@ -33,7 +33,8 @@ export const MessageController = {
 			throw { message: "Missing required fields", status: 400 };
 		}
 
-		const message = await MessageService.sendMessage(conversation, sender, text);
+		const message = (await MessageService.sendMessage(conversation, sender._id, text)).toObject();
+		message.sender = sender;
 		res.status(201).json({ message: "Message sent successfully", newMessage: message });
 	}),
 };

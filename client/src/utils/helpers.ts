@@ -1,5 +1,5 @@
 export const calculatePasswordStrength = (password: string): string => {
-	if (!password) {
+	if (!password || password.length < 8) {
 		return "weak";
 	}
 
@@ -35,7 +35,7 @@ export const formatTime12Hour = (dateString: string): string => {
 		return "Invalid Date";
 	}
 
-	const hours = date.getHours() % 12 || 12;
+	const hours = (date.getHours() % 12 || 12).toString().padStart(2, "0");
 	const minutes = date.getMinutes().toString().padStart(2, "0");
 	const period = date.getHours() >= 12 ? "PM" : "AM";
 
@@ -61,4 +61,13 @@ export const validateEmail = (email: string): boolean => {
 
 	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 	return emailRegex.test(email);
+};
+
+export const validateUsername = (username: string): boolean => {
+	if (!username) {
+		return false;
+	}
+
+	const usernameRegex = /^(?!.*__)(?!^_+$)[a-zA-Z0-9_]{3,}$/;
+	return usernameRegex.test(username);
 };

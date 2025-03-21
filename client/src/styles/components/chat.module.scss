@@ -1,12 +1,25 @@
 .chat {
+	position: relative;
 	width: calc(100% - 300px);
 	height: 100%;
 	background: var(--background-one);
 	display: flex;
 	flex-direction: column;
 
+	.loader {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 2.5rem;
+		height: 2.5rem;
+		border: 6px solid transparent;
+		border-top: 6px solid var(--foreground-two);
+		border-radius: 50%;
+		animation: spin 1000ms linear infinite;
+	}
+
 	.top_section {
-		padding: 1.75rem 2rem;
+		padding: 1.5rem 2rem;
 		border-bottom: 2px solid var(--stroke);
 		display: flex;
 		justify-content: space-between;
@@ -18,13 +31,13 @@
 			gap: 0.75rem;
 
 			.avatar {
-				width: 35px;
-				height: 35px;
+				width: 2rem;
+				height: 2rem;
 				border: 2px solid var(--red-stroke);
 				border-radius: 50%;
 				background: var(--red-background);
 				color: var(--red-foreground);
-				font-size: 1rem;
+				font-size: 0.9rem;
 				text-transform: uppercase;
 				display: flex;
 				justify-content: center;
@@ -37,7 +50,7 @@
 			}
 
 			h3 {
-				font-size: 1rem;
+				font-size: 0.9rem;
 				font-weight: 500;
 			}
 
@@ -47,7 +60,7 @@
 				font-size: 1.25rem;
 				display: flex;
 				cursor: pointer;
-				transition: 100ms ease-in;
+				transition: 100ms ease;
 
 				&:hover {
 					color: var(--foreground-one);
@@ -62,11 +75,17 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		flex: 1;
-		overflow: auto;
-		scrollbar-width: none;
+		overflow-y: scroll;
+		scrollbar-width: thin;
+		scrollbar-color: var(--stroke) transparent;
 
 		&::-webkit-scrollbar {
-			display: none;
+			width: 6px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			border-radius: 4px;
+			background: var(--stroke);
 		}
 
 		.toast {
@@ -224,7 +243,7 @@
 				align-items: center;
 				gap: 0.5rem;
 				cursor: pointer;
-				transition: 100ms ease-in;
+				transition: 100ms ease;
 
 				&:not(:disabled):hover {
 					background: var(--dark-accent);
@@ -240,6 +259,16 @@
 				}
 			}
 		}
+	}
+}
+
+@keyframes spin {
+	from {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+
+	to {
+		transform: translate(-50%, -50%) rotate(360deg);
 	}
 }
 

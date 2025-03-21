@@ -1,24 +1,61 @@
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RiArrowRightSLine, RiSearchLine } from "react-icons/ri";
 import { CgLogOut } from "react-icons/cg";
 
+import { AuthContext } from "@/contexts/auth-context";
+import { ConversationsContext } from "@/contexts/conversations-context";
+import { MessagesContext } from "@/contexts/message-context";
+import { useContextHook } from "@/hooks/use-context-hook";
 import { truncateString } from "@/utils/helpers";
 
 import styles from "@/styles/components/sidebar.module.scss";
-import { useContextHook } from "@/hooks/use-context-hook";
-import { AuthContext } from "@/contexts/auth-context";
-import { ConversationsContext } from "@/contexts/conversations-context";
 
 interface Props {
 	setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const SKELETON_ITEM_HEIGHT = 44;
+
 export default function Sidebar({ setIsSearchOpen }: Props) {
 	const { user, logout } = useContextHook(AuthContext);
-	const { state: conversationsState, joinConversation } = useContextHook(ConversationsContext);
+	const {
+		state: conversationsState,
+		joinConversation,
+		leaveConversation,
+	} = useContextHook(ConversationsContext);
+	const { clearMessages } = useContextHook(MessagesContext);
+
+	const skeletonContainerRef = useRef<HTMLDivElement>(null);
+	const [skeletonCount, setSkeletonCount] = useState(30);
 
 	const [isVisible, setIsVisible] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		if (conversationsState.conversations && conversationsState.conversations.length > 0) {
+			setIsLoading(false);
+		}
+	}, [conversationsState.conversations]);
+
+	useEffect(() => {
+		if (!skeletonContainerRef.current) {
+			return;
+		}
+
+		const updateSkeletonCount = () => {
+			const containerHeight = skeletonContainerRef.current?.clientHeight ?? 0;
+			setSkeletonCount(Math.floor(containerHeight / SKELETON_ITEM_HEIGHT));
+		};
+
+		const observer = new ResizeObserver(updateSkeletonCount);
+		observer.observe(skeletonContainerRef.current);
+		updateSkeletonCount();
+
+		return () => {
+			observer.disconnect();
+		};
+	}, []);
 
 	const conversations = useMemo(
 		() => conversationsState.conversations ?? [],
@@ -44,7 +81,19 @@ export default function Sidebar({ setIsSearchOpen }: Props) {
 						<h3>Conversations [{conversations.length}]</h3>
 					</div>
 
-					{conversations.length > 0 ? (
+					{isLoading ? (
+						<div
+							className={`${styles["container"]} ${isLoading ? styles["loading"] : ""}`}
+							ref={skeletonContainerRef}
+						>
+							{Array.from({ length: skeletonCount + 1 }).map((_, index) => (
+								<div className={styles["skeleton"]} key={index}>
+									<div className={styles["avatar"]} />
+									<div className={styles["text"]} />
+								</div>
+							))}
+						</div>
+					) : conversations.length > 0 ? (
 						<div className={styles["container"]}>
 							{conversations.map((conversation) => {
 								const isActive = conversationsState.activeConversation?._id === conversation._id;
@@ -58,9 +107,12 @@ export default function Sidebar({ setIsSearchOpen }: Props) {
 
 								return (
 									<div
-										className={`${styles["conversation"]} ${styles[isActive ? "active" : ""]}`}
+										className={`${styles["conversation"]} ${isActive ? styles["active"] : ""}`}
 										key={conversation._id}
-										onClick={() => joinConversation(conversation)}
+										onClick={() => {
+											joinConversation(conversation);
+											setIsVisible(false);
+										}}
 									>
 										<div className={styles["avatar"]}>{participant.username.charAt(0)}</div>
 										<h3>{truncateString(participant.username, 15)}</h3>
@@ -69,17 +121,22 @@ export default function Sidebar({ setIsSearchOpen }: Props) {
 							})}
 						</div>
 					) : (
-						<div className={styles["subtitle"]}>
-							<span>No conversations found</span>
-						</div>
+						<div className={styles["subtitle"]}>No conversations found</div>
 					)}
 				</div>
 			</div>
 
 			<div className={styles["bottom_section"]}>
-				<button onClick={logout} type="button">
+				<button
+					onClick={() => {
+						leaveConversation();
+						clearMessages();
+						logout();
+					}}
+					type="button"
+				>
 					<CgLogOut />
-					<span>Log out</span>
+					Log out
 				</button>
 			</div>
 

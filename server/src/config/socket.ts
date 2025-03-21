@@ -1,10 +1,10 @@
 import type { Server, Socket } from "socket.io";
 
 import type { IMessage } from "@/models/message.model";
-import { validateConversationId, validateMessage } from "@/utils/validators";
+import { Types } from "mongoose";
 
 const joinConversation = (socket: Socket, conversationId: string) => {
-	if (!validateConversationId(conversationId)) {
+	if (!Types.ObjectId.isValid(conversationId)) {
 		socket.emit("error", "Invalid conversation ID");
 		return;
 	}
@@ -14,7 +14,7 @@ const joinConversation = (socket: Socket, conversationId: string) => {
 };
 
 const leaveConversation = (socket: Socket, conversationId: string) => {
-	if (!validateConversationId(conversationId)) {
+	if (!Types.ObjectId.isValid(conversationId)) {
 		socket.emit("error", "Invalid conversation ID");
 		return;
 	}
@@ -24,8 +24,8 @@ const leaveConversation = (socket: Socket, conversationId: string) => {
 };
 
 const sendMessage = (socket: Socket, message: IMessage) => {
-	if (!validateMessage(message)) {
-		socket.emit("error", "Invalid message format");
+	if (!Types.ObjectId.isValid(message.conversation)) {
+		socket.emit("error", "Invalid conversation ID");
 		return;
 	}
 

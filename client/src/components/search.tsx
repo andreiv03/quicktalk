@@ -5,10 +5,10 @@ import { ConversationsContext } from "@/contexts/conversations-context";
 import { useContextHook } from "@/hooks/use-context-hook";
 import type { GetConversationResponse } from "@/types/conversation";
 import type { GetUsersResponse, User } from "@/types/user";
+import { asyncHandler } from "@/utils/async-handler";
+import { truncateString } from "@/utils/helpers";
 
 import styles from "@/styles/components/search.module.scss";
-import { truncateString } from "@/utils/helpers";
-import { asyncHandler } from "@/utils/async-handler";
 
 interface Props {
 	isSearchOpen: boolean;
@@ -21,31 +21,36 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 	const searchRef = useRef<HTMLInputElement>(null);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [users, setUsers] = useState<User[]>([]);
-	const [loading, setLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const fetchUsers = useCallback(async (searchQuery: string) => {
 		try {
 			await asyncHandler(async () => {
-				if (searchQuery.trim()) {
-					setLoading(true);
+				if (searchQuery) {
+					setIsLoading(true);
 					const { data } = await axios.get<GetUsersResponse>(`/users/search/${searchQuery}`);
 					setUsers(data.users);
-					setLoading(false);
 				}
 			}, true)();
 		} catch {
-			setLoading(false);
+			setUsers([]);
+		} finally {
+			setIsLoading(false);
 		}
 	}, []);
 
 	useEffect(() => {
 		const delaySearch = setTimeout(() => {
 			if (searchQuery.trim()) {
-				fetchUsers(searchQuery);
+				fetchUsers(searchQuery.trim());
+			} else {
+				setUsers([]);
 			}
 		}, 300);
 
-		return () => clearTimeout(delaySearch);
+		return () => {
+			clearTimeout(delaySearch);
+		};
 	}, [searchQuery, fetchUsers]);
 
 	const closeSearch = useCallback(() => {
@@ -67,13 +72,19 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 
 	return (
 		<>
-			<div className={`${styles["search"]} ${styles[isSearchOpen ? "open" : ""]}`}>
-				<form>
+			<div className={`${styles["search"]} ${isSearchOpen ? styles["open"] : ""}`}>
+				<form
+					onKeyDown={(event) => {
+						if (event.key === "Enter" && users.length > 0 && users[0]) {
+							openConversation(users[0]._id);
+						}
+					}}
+					onSubmit={(event) => event.preventDefault()}
+				>
 					<label htmlFor="search">Find or start a conversation</label>
-					<div className={styles["input_container"]}>
+					<div className={styles["field"]}>
 						<input
 							autoComplete="off"
-							autoFocus
 							id="search"
 							onChange={(event) => setSearchQuery(event.target.value)}
 							placeholder="username"
@@ -81,12 +92,12 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 							type="text"
 							value={searchQuery}
 						/>
+
+						{searchQuery && isLoading && <div className={styles["loader"]} />}
 					</div>
 				</form>
 
-				{loading && <div className={styles["loading"]}>Searching...</div>}
-
-				{!loading && users.length > 0 ? (
+				{!isLoading && users.length > 0 ? (
 					<div className={styles["users"]}>
 						{users.map((user) => (
 							<div
@@ -106,7 +117,7 @@ const Search: React.FC<Props> = ({ isSearchOpen, setIsSearchOpen }) => {
 			</div>
 
 			<div
-				className={`${styles["overlay"]} ${styles[isSearchOpen ? "open" : ""]}`}
+				className={`${styles["overlay"]} ${isSearchOpen ? styles["open"] : ""}`}
 				onClick={closeSearch}
 			/>
 		</>

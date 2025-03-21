@@ -23,18 +23,18 @@ export default function Menu({ isMenuOpen, setIsMenuOpen }: Props) {
 
 	return (
 		<>
-			<div className={`${styles["menu"]} ${styles[isMenuOpen ? "open" : ""]}`}>
+			<div className={`${styles["menu"]} ${isMenuOpen ? styles["open"] : ""}`}>
 				<button onClick={closeConversation} type="button">
 					End conversation
 				</button>
 
 				<button onClick={() => setIsMenuOpen(false)} type="button">
-					Close
+					Close menu
 				</button>
 			</div>
 
 			<div
-				className={`${styles["overlay"]} ${styles[isMenuOpen ? "open" : ""]}`}
+				className={`${styles["overlay"]} ${isMenuOpen ? styles["open"] : ""}`}
 				onClick={() => setIsMenuOpen(false)}
 			/>
 		</>

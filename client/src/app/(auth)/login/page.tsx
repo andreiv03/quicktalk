@@ -17,6 +17,7 @@ export default function Login() {
 	const [password, setPassword] = useState("");
 
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const validateForm = () => {
 		return !!username && !!password;
@@ -25,19 +26,23 @@ export default function Login() {
 	const submitForm = asyncHandler(async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		if (!validateForm()) {
+		if (isLoading || !validateForm()) {
 			return;
 		}
+
+		setIsLoading(true);
 
 		const formData = {
 			username: username.toLowerCase(),
 			password,
 		};
 
-		setUsername("");
-		setPassword("");
+		const success = await login(formData);
+		if (!success) {
+			setPassword("");
+		}
 
-		await login(formData);
+		setIsLoading(false);
 	});
 
 	return (
@@ -52,6 +57,7 @@ export default function Login() {
 							autoComplete="username"
 							autoFocus
 							id="username"
+							disabled={isLoading}
 							onChange={(event) => setUsername(event.target.value)}
 							placeholder=""
 							type="text"
@@ -64,6 +70,7 @@ export default function Login() {
 						<input
 							autoComplete="current-password"
 							id="password"
+							disabled={isLoading}
 							onChange={(event) => setPassword(event.target.value)}
 							placeholder=""
 							type={isPasswordVisible ? "text" : "password"}
@@ -79,8 +86,8 @@ export default function Login() {
 						</div>
 					</div>
 
-					<button disabled={!validateForm()} type="submit">
-						Sign in
+					<button disabled={isLoading || !validateForm()} type="submit">
+						{isLoading ? <span className={styles["loader"]} /> : "Sign in"}
 					</button>
 				</form>
 

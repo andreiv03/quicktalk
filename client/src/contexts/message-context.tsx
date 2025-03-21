@@ -92,12 +92,15 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
 
 				const formData = {
 					conversation: conversationsState.activeConversation._id,
-					sender: user._id,
+					sender: {
+						_id: user._id,
+						username: user.username,
+					},
 					text,
 				};
 
 				const { data } = await axios.post<SendMessageResponse>("/messages/send-message", formData);
-				socket.emit("send_message", data);
+				socket.emit("send_message", data.newMessage);
 				dispatch({ type: "SET_MESSAGES", payload: [...state.messages, data.newMessage] });
 			})();
 		},

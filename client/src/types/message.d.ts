@@ -2,7 +2,10 @@ export interface Message {
 	_id: string;
 	conversation: string;
 	createdAt: string;
-	sender: string;
+	sender: {
+		_id: string;
+		username: string;
+	};
 	text: string;
 }
 

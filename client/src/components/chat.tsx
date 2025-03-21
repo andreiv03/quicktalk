@@ -20,11 +20,34 @@ export default function Chat({ setIsMenuOpen }: Props) {
 	const { state: conversationsState } = useContextHook(ConversationsContext);
 	const { state: messagesState, sendMessage } = useContextHook(MessagesContext);
 
-	const messagesContainerRef = useRef({} as HTMLDivElement);
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const [messageText, setMessageText] = useState("");
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		messagesContainerRef.current.scrollTo(0, messagesContainerRef.current.scrollHeight);
+		if (conversationsState.activeConversation) {
+			setIsLoading(true);
+		}
+	}, [conversationsState.activeConversation]);
+
+	const scrollToBottom = () => {
+		if (!messagesContainerRef.current) {
+			return;
+		}
+
+		messagesContainerRef.current.scrollTo({ top: messagesContainerRef.current.scrollHeight });
+	};
+
+	useEffect(() => {
+		scrollToBottom();
+	}, []);
+
+	useEffect(() => {
+		if (messagesState.messages) {
+			setIsLoading(false);
+		}
+
+		scrollToBottom();
 	}, [messagesState.messages]);
 
 	const getConversationName = () => {
@@ -41,6 +64,10 @@ export default function Chat({ setIsMenuOpen }: Props) {
 
 	const handleSendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+
+		if (!user || !conversationsState.activeConversation || !messageText) {
+			return;
+		}
 
 		sendMessage(messageText);
 		setMessageText("");
@@ -63,41 +90,46 @@ export default function Chat({ setIsMenuOpen }: Props) {
 
 			<div className={styles["messages"]} ref={messagesContainerRef}>
 				<div className={styles["toast"]}>Each message is automatically deleted after 24 hours.</div>
+				{isLoading && <div className={styles["loader"]} />}
 
-				{messagesState.messages.map((message: Message, index: number) => (
-					<div
-						className={message.sender === user?.username ? styles["right"] : styles["left"]}
-						key={message._id}
-					>
-						<div
-							className={`${styles["wrapper"]} ${
-								index < messagesState.messages.length - 1 &&
-								message.sender === messagesState.messages[index + 1]?.sender
-									? styles["current_sender"]
-									: ""
-							}`}
-						>
-							<div className={styles["message"]}>{message.text}</div>
+				{!isLoading &&
+					messagesState.messages.map((message: Message, index: number) => {
+						if (!user || !message.sender) {
+							return null;
+						}
 
-							<div className={styles["sender"]}>
+						const isUserSender = message.sender._id === user._id;
+
+						return (
+							<div className={isUserSender ? styles["right"] : styles["left"]} key={message._id}>
 								<div
-									className={`${styles["avatar"]} ${
-										message.sender !== user?.username ? styles["visible"] : ""
+									className={`${styles["wrapper"]} ${
+										index < messagesState.messages.length - 1 &&
+										message.sender._id === messagesState.messages[index + 1]?.sender._id
+											? styles["current_sender"]
+											: ""
 									}`}
 								>
-									{message.sender[0]}
-								</div>
+									<div className={styles["message"]}>{message.text}</div>
 
-								<div className={styles["informations"]}>
-									<div className={styles["username"]}>
-										{message.sender === user?.username ? "You" : message.sender}
+									<div className={styles["sender"]}>
+										<div
+											className={`${styles["avatar"]} ${!isUserSender ? styles["visible"] : ""}`}
+										>
+											{message.sender.username[0]}
+										</div>
+
+										<div className={styles["informations"]}>
+											<div className={styles["username"]}>
+												{isUserSender ? "You" : message.sender.username}
+											</div>
+											<div className={styles["date"]}>{formatTime12Hour(message.createdAt)}</div>
+										</div>
 									</div>
-									<div className={styles["date"]}>{formatTime12Hour(message.createdAt)}</div>
 								</div>
 							</div>
-						</div>
-					</div>
-				))}
+						);
+					})}
 			</div>
 
 			<div className={styles["bottom_section"]}>
