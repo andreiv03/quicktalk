@@ -70,6 +70,8 @@ cd server && npm install
 # Create a .env file in the root directory and configure your settings
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_secret_key
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
+UPSTASH_REDIS_REST_URL=your_upstash_redis_url
 
 # Start the development server
 npm run dev
