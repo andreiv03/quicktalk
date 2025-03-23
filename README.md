@@ -68,7 +68,7 @@ cd quicktalk
 cd server && npm install
 
 # Create a .env file in the root directory and configure your settings
-MONGODB_URI=mongodb://localhost:27017/quicktalk
+MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_secret_key
 
 # Start the development server
