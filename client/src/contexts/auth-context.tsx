@@ -8,6 +8,8 @@ import type { LoginFormData, RegisterFormData } from "@/types/auth";
 import type { GetUserResponse, User } from "@/types/user";
 import { asyncHandler } from "@/utils/async-handler";
 
+import styles from "@/styles/pages/auth.module.scss";
+
 interface AuthContext {
 	user: User | null;
 	login: (formData: LoginFormData) => Promise<boolean>;
@@ -19,15 +21,29 @@ export const AuthContext = createContext<AuthContext | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
-	const [user, setUser] = useState<User | null>(null);
 
-	const logout = useCallback(() => {
-		return asyncHandler(async () => {
-			await axios.post("/api/auth/logout");
-			setUser(null);
-			router.replace("/login");
-		})();
-	}, [router]);
+	const [user, setUser] = useState<User | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const logout = useCallback(async () => {
+		if (!user) {
+			return;
+		}
+
+		try {
+			await asyncHandler(async () => {
+				setIsLoading(true);
+				await axios.post("/api/auth/logout", { userId: user._id });
+				setUser(null);
+				router.replace("/login");
+			}, true)();
+		} catch {
+		} finally {
+			setTimeout(() => {
+				setIsLoading(false);
+			}, 2000);
+		}
+	}, [user, router]);
 
 	const fetchUser = useCallback(async () => {
 		if (user) {
@@ -95,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 		try {
 			await asyncHandler(async () => {
-				await axios.get("/api/auth/refresh-token");
+				await axios.post("/api/auth/refresh-token");
 			}, true)();
 		} catch {
 			await logout();
@@ -118,5 +134,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		[user, login, register, logout],
 	);
 
-	return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+	return (
+		<AuthContext.Provider value={contextValue}>
+			{isLoading ? <div className={styles["logout_loader"]} /> : children}
+		</AuthContext.Provider>
+	);
 }

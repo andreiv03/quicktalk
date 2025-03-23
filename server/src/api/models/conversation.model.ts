@@ -30,4 +30,10 @@ const ConversationSchema = new Schema<IConversation>(
 	},
 );
 
+// Index for fetching conversations of a user
+ConversationSchema.index({ participants: 1 });
+
+// Index for fetching archived conversations of a user
+ConversationSchema.index({ participants: 1, isArchived: 1 });
+
 export const Conversation = model<IConversation>("Conversation", ConversationSchema);

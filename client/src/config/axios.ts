@@ -18,11 +18,15 @@ axiosInstance.interceptors.request.use(
 			config.baseURL = `${ENV.SERVER_URL}/api`;
 		}
 
-		if (config.url.startsWith("/api/auth") || config.url.startsWith("/auth")) {
+		if (
+			config.url === "/health" ||
+			config.url.startsWith("/api/auth") ||
+			config.url.startsWith("/auth")
+		) {
 			return config;
 		}
 
-		const { data } = await axios.get<AuthResponse>("/api/auth/refresh-token");
+		const { data } = await axios.post<AuthResponse>("/api/auth/refresh-token");
 		if (!data.accessToken) {
 			return Promise.reject(new axios.Cancel("Failed to refresh token"));
 		}

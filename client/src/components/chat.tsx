@@ -21,6 +21,8 @@ export default function Chat({ setIsMenuOpen }: Props) {
 	const { state: messagesState, sendMessage } = useContextHook(MessagesContext);
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const sendMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 	const [messageText, setMessageText] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -69,8 +71,16 @@ export default function Chat({ setIsMenuOpen }: Props) {
 			return;
 		}
 
+		if (sendMessageTimeoutRef.current) {
+			return;
+		}
+
 		sendMessage(messageText);
 		setMessageText("");
+
+		sendMessageTimeoutRef.current = setTimeout(() => {
+			sendMessageTimeoutRef.current = null;
+		}, 500);
 	};
 
 	return (

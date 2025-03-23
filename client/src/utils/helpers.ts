@@ -20,15 +20,6 @@ export const calculatePasswordStrength = (password: string): string => {
 	return result;
 };
 
-export const extractToken = (cookies: string[] | undefined, tokenName: string) => {
-	if (!cookies) {
-		return null;
-	}
-
-	const token = cookies.find((cookie) => cookie.startsWith(`${tokenName}=`));
-	return token ? token.split("=")[1]?.split(";")[0]?.trim() || null : null;
-};
-
 export const formatTime12Hour = (dateString: string): string => {
 	const date = new Date(dateString);
 	if (isNaN(date.getTime())) {
@@ -40,6 +31,16 @@ export const formatTime12Hour = (dateString: string): string => {
 	const period = date.getHours() >= 12 ? "PM" : "AM";
 
 	return `${hours}:${minutes} ${period}`;
+};
+
+export const getClientInfo = async () => {
+	const userAgent = navigator.userAgent;
+
+	const res = await fetch("https://api.ipify.org?format=json");
+	const data = await res.json();
+	const ip = data.ip;
+
+	return { userAgent, ip };
 };
 
 export const truncateString = (text: string, maxLength: number, suffix = "..."): string => {

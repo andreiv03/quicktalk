@@ -10,7 +10,6 @@ const joinConversation = (socket: Socket, conversationId: string) => {
 	}
 
 	socket.join(conversationId);
-	console.log(`Socket ${socket.id} joined conversation ${conversationId}`);
 };
 
 const leaveConversation = (socket: Socket, conversationId: string) => {
@@ -20,7 +19,6 @@ const leaveConversation = (socket: Socket, conversationId: string) => {
 	}
 
 	socket.leave(conversationId);
-	console.log(`Socket ${socket.id} left conversation ${conversationId}`);
 };
 
 const sendMessage = (socket: Socket, message: IMessage) => {
@@ -30,13 +28,10 @@ const sendMessage = (socket: Socket, message: IMessage) => {
 	}
 
 	socket.to(message.conversation.toString()).emit("receive_message", message);
-	console.log(`Message sent to conversation ${message.conversation}`);
 };
 
 export const establishSocketIOConnection = (io: Server) => {
 	io.on("connection", (socket: Socket) => {
-		console.log(`Socket ${socket.id} connected`);
-
 		socket.on("join_conversation", (conversationId: string) =>
 			joinConversation(socket, conversationId),
 		);
@@ -47,10 +42,6 @@ export const establishSocketIOConnection = (io: Server) => {
 
 		socket.on("send_message", (message: IMessage) => {
 			sendMessage(socket, message);
-		});
-
-		socket.on("disconnect", () => {
-			console.log(`Socket ${socket.id} disconnected`);
 		});
 	});
 };

@@ -7,7 +7,12 @@ import { RiEyeFill, RiEyeOffFill, RiInformation2Fill } from "react-icons/ri";
 import { AuthContext } from "@/contexts/auth-context";
 import { useContextHook } from "@/hooks/use-context-hook";
 import { asyncHandler } from "@/utils/async-handler";
-import { calculatePasswordStrength, validateEmail, validateUsername } from "@/utils/helpers";
+import {
+	calculatePasswordStrength,
+	getClientInfo,
+	validateEmail,
+	validateUsername,
+} from "@/utils/helpers";
 
 import styles from "@/styles/pages/auth.module.scss";
 
@@ -45,10 +50,13 @@ export default function Register() {
 
 		setIsLoading(true);
 
+		const { userAgent, ip } = await getClientInfo();
 		const formData = {
 			username: username.toLowerCase(),
 			email,
 			password,
+			userAgent,
+			ip,
 		};
 
 		const success = await register(formData);

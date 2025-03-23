@@ -7,6 +7,7 @@ import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
 import { AuthContext } from "@/contexts/auth-context";
 import { useContextHook } from "@/hooks/use-context-hook";
 import { asyncHandler } from "@/utils/async-handler";
+import { getClientInfo } from "@/utils/helpers";
 
 import styles from "@/styles/pages/auth.module.scss";
 
@@ -32,9 +33,12 @@ export default function Login() {
 
 		setIsLoading(true);
 
+		const { userAgent, ip } = await getClientInfo();
 		const formData = {
 			username: username.toLowerCase(),
 			password,
+			userAgent,
+			ip,
 		};
 
 		const success = await login(formData);

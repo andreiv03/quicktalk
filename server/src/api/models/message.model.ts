@@ -32,4 +32,7 @@ const MessageSchema = new Schema<IMessage>(
 // Automatically delete messages after 24 hours
 MessageSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
 
+// Index for fetching messages in a conversation
+MessageSchema.index({ conversation: 1, createdAt: -1 });
+
 export const Message = model<IMessage>("Message", MessageSchema);

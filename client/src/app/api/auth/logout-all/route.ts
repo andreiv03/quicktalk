@@ -6,12 +6,7 @@ import axios from "@/config/axios";
 export async function POST(req: Request) {
 	try {
 		const { userId } = await req.json();
-		const sessionId = (await cookies()).get("sessionId");
-		if (!sessionId?.value) {
-			return NextResponse.json({ success: true });
-		}
-
-		await axios.post("/auth/logout", { userId, sessionId: sessionId.value });
+		await axios.post("/auth/logout-all", { userId });
 
 		(await cookies()).delete("accessToken");
 		(await cookies()).delete("refreshToken");

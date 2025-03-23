@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { ConversationsProvider } from "@/contexts/conversations-context";
 import { MessagesProvider } from "@/contexts/message-context";
 
+import { ServerHealthCheck } from "@/components/server-health-check";
 import "@/styles/globals.scss";
 
 const poppins = Poppins({
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 	description: "Connect with friends and the world around you. It's quick and easy!",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
@@ -25,11 +26,13 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={poppins.className}>
-				<AuthProvider>
-					<ConversationsProvider>
-						<MessagesProvider>{children}</MessagesProvider>
-					</ConversationsProvider>
-				</AuthProvider>
+				<ServerHealthCheck>
+					<AuthProvider>
+						<ConversationsProvider>
+							<MessagesProvider>{children}</MessagesProvider>
+						</ConversationsProvider>
+					</AuthProvider>
+				</ServerHealthCheck>
 			</body>
 		</html>
 	);

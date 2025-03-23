@@ -3,20 +3,24 @@ import type { HelmetOptions } from "helmet";
 
 dotenvFlow.config();
 
-const DEFAULTS = {
-	NODE_ENV: "development",
+const ENV_DEFAULTS = {
 	DEV_CLIENT_URL: "http://localhost:3000",
-	PROD_CLIENT_URL: "https://quicktalk-client.vercel.app",
+	NODE_ENV: "development",
 	PORT: "5000",
+	PROD_CLIENT_URL: "https://quicktalk-client.vercel.app",
 };
 
 export const ENV = {
-	NODE_ENV: process.env["NODE_ENV"] || DEFAULTS.NODE_ENV,
 	CLIENT_URL:
-		process.env["NODE_ENV"] === "production" ? DEFAULTS.PROD_CLIENT_URL : DEFAULTS.DEV_CLIENT_URL,
+		process.env["NODE_ENV"] === "production"
+			? ENV_DEFAULTS.PROD_CLIENT_URL
+			: ENV_DEFAULTS.DEV_CLIENT_URL,
 	JWT_SECRET: process.env["JWT_SECRET"] as string,
 	MONGODB_URI: process.env["MONGODB_URI"] as string,
-	PORT: process.env["PORT"] || DEFAULTS.PORT,
+	NODE_ENV: process.env["NODE_ENV"] || ENV_DEFAULTS.NODE_ENV,
+	PORT: process.env["PORT"] || ENV_DEFAULTS.PORT,
+	UPSTASH_REDIS_REST_TOKEN: process.env["UPSTASH_REDIS_REST_TOKEN"] as string,
+	UPSTASH_REDIS_REST_URL: process.env["UPSTASH_REDIS_REST_URL"] as string,
 } as const;
 
 Object.entries(ENV).forEach(([key, value]) => {
@@ -51,12 +55,4 @@ export const HELMET_OPTIONS: HelmetOptions = {
 	permittedCrossDomainPolicies: { permittedPolicies: "none" },
 	referrerPolicy: { policy: "no-referrer" },
 	xssFilter: true,
-} as const;
-
-export const COOKIE_OPTIONS = {
-	httpOnly: true,
-	maxAge: 7 * 24 * 60 * 60, // 7 days
-	path: "/",
-	sameSite: "strict",
-	secure: process.env["NODE_ENV"] !== "development",
 } as const;
